@@ -356,11 +356,14 @@ class EISDOPT(object):
         if cool_sched is None:
             cool_sched = EISDOPT.default_cool
 
-        if self.verbose_ and self.fstats_ is not None:
-            statsf = open(self.fstats_, 'w')
-            stats_str = "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%ss" % (
+        stats_str = "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%ss" % (
                 "iter", "accept?", "e", "prior", "jcoup_e", "shift_e",
                 "p_a", "iter_time")
+        if self.verbose_:
+            print stats_str
+
+        if self.fstats_ is not None:
+            statsf = open(self.fstats_, 'w')
             statsf.write(stats_str + "\n")
 
         # determine starting energy and prior scale parameter
