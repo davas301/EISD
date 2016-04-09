@@ -29,8 +29,5 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 This repository contains an implementation of the procedures outlined in 
 J. Am. Chem. Soc., 2016, 138 (13), pp 4530–4538.
 
-This program requires that numpy, MMTK, SciPy and Scikit-learn are installed
-
-See eisd.py for example programs. 
-
-Please contact david.brookes@berkeley.edu with questions.
+Please read the online documentation for more information and
+ contact david.brookes@berkeley.edu with any questions.
