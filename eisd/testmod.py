@@ -5,7 +5,8 @@ import numpy as np
 import readutil
 from backcalc import JCoupBackCalc, ShiftBackCalc
 from eisd import DataEISD, EISDOPT
-from priors import UniformPrior, EnergyPrior
+from priors import UniformPrior
+# from priors2 import En
 from structure import Structure
 
 """
@@ -91,9 +92,9 @@ def optimize_ensemble():
     subset_size = 1000
 
     # build prior
-    pdb_energy_dict = readutil.get_md_energies()
-    ref_energies = pdb_energy_dict.values()
-    prior = EnergyPrior(ref_energies, pdb_dict=pdb_energy_dict)
+    # pdb_energy_dict = readutil.get_md_energies()
+    # ref_energies = pdb_energy_dict.values()
+    prior = UniformPrior(1)
 
     # build DataEISD objects
     jcoup_eisd = DataEISD(JCoupBackCalc(), readutil.get_ab42_jcoup_data(),
