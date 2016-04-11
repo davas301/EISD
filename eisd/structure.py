@@ -1,8 +1,9 @@
 # from MMTK.PDB import PDBConfiguration
 # from MMTK.Proteins import Protein
-
+import Bio.PDB
 from readutil import RunShiftX, Measurement
 from readutil import ShiftID
+
 
 """
 Copyright (c) 2016, Teresa Head-Gordon and David Brookes
@@ -56,14 +57,19 @@ class Structure(object):
         """
         self.pdb_ = pdbfile.split('/')[-1]  # only want the name of the pdb
 
-        pdbconfig = PDBConfiguration(pdbfile)
-        pdbconfig.deleteHydrogens()
-        pepchains = pdbconfig.createPeptideChains()
-        chain_idx = 0
+        parser = Bio.PDB.PDBParser()
+        struct = parser.get_structure(self.pdb_, pdbfile)
+        chain = struct.get_chains().next()
+        self.protein_ = Bio.PDB.Polypeptide.Polypeptide(chain)
 
-        self.protein_ = Protein(pepchains[chain_idx])
-        self.protein_.normalizeConfiguration()
-        self.sequence_ = self.protein_.chains[0][0].sequence()
+        # pdbconfig = PDBConfiguration(pdbfile)
+        # pdbconfig.deleteHydrogens()
+        # pepchains = pdbconfig.createPeptideChains()
+        # chain_idx = 0
+        #
+        # self.protein_ = Protein(pepchains[chain_idx])
+        # self.protein_.normalizeConfiguration()
+        # self.sequence_ = self.protein_.chains[0][0].sequence()
 
         if shiftxfile is not None:
             self.shiftxdata_ = RunShiftX.read_ouput(shiftxfile)
@@ -75,38 +81,38 @@ class Structure(object):
 
         self.energy_ = energy
         self.dihed_ = self._get_all_dihed()
-        self.coords_ = self._get_all_atom_coords()
-
-    def _get_all_atom_coords(self):
-        """
-        Retrieve all of the atomic coordinates in this structure.
-        :return: a {(res_num, atom_name): [x,y,z]} dict
-        """
-        dout = {}
-        for atom in self.protein_.atomList():
-            atom_name = atom.name
-            res_num = atom.parent.parent.sequence_number
-            idx = atom.index
-            if atom.array is None:
-                coords = atom.pos[0]
-            else:
-                coords = atom.array[idx]
-            dout[(res_num, atom_name)] = coords
-        return dout
+    #     self.coords_ = self._get_all_atom_coords()
+    #
+    # def _get_all_atom_coords(self):
+    #     """
+    #     Retrieve all of the atomic coordinates in this structure.
+    #     :return: a {(res_num, atom_name): [x,y,z]} dict
+    #     """
+    #     dout = {}
+    #     for atom in self.protein_.atomList():
+    #         atom_name = atom.name
+    #         res_num = atom.parent.parent.sequence_number
+    #         idx = atom.index
+    #         if atom.array is None:
+    #             coords = atom.pos[0]
+    #         else:
+    #             coords = atom.array[idx]
+    #         dout[(res_num, atom_name)] = coords
+    #     return dout
 
     def _get_all_dihed(self):
         """
         Retrieve all phi, psi dihedral angles in this structure
         :return: a {res_num: (phi, psi)} dict
         """
-        all_res = self.protein_.residues()
+        phi_psi = self.protein_.get_phi_psi_list()
         all_dihed = {}
-        for i in range(0, len(all_res)):
-            phi_psi = all_res[i].phiPsi()
-            phi = phi_psi[0]
-            psi = phi_psi[1]
-            res_num = all_res[i].sequence_number
-            all_dihed[res_num] = (phi, psi)
+        for i in range(0, len(phi_psi)):
+            # phi_psi = all_res[i].phiPsi()
+            # phi = phi_psi[0]
+            # psi = phi_psi[1]
+            # res_num = all_res[i].sequence_number
+            all_dihed[i+1] = phi_psi[i]
         return all_dihed
 
     def get_struct_measure(self, exp_id):

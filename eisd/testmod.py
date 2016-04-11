@@ -120,3 +120,9 @@ def optimize_ensemble():
                         stats_file=stats_file)
     niter = int(1e5)
     optimizer.opt(niter, cool_sched=cool_sched)
+
+
+
+
+test_ensemble("/Users/davidbrookes/data/pdb_J2_2")
+

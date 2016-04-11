@@ -249,7 +249,7 @@ def get_ab42_jcoup_data():
     Read the J-coupling data for aB42
     :return: a {JCoupID: val} dict
     """
-    jcoup_data_path = "./test_data/bax_2016_jcoup.txt"
+    jcoup_data_path = "../test_data/bax_2016_jcoup.txt"
     jcoup_data = {}
     expf = open(jcoup_data_path)
     lines = expf.readlines()
@@ -269,7 +269,7 @@ def get_ab42_shift_data():
     Read the shift data for aB42
     :return: a {ShiftID: val} dict
     """
-    shift_data_path = "./test_data/filtered_ab42_cs.txt"
+    shift_data_path = "../test_data/filtered_ab42_cs.txt"
     shift_data = {}
     expf = open(shift_data_path)
     lines = expf.readlines()
