@@ -61,6 +61,7 @@ def normal_loglike(x, mu, sig):
     """
     Returns the log likelihood of a value x in a normal distribution with
     mean mu and stdev sig.
+
     :param x: list of values to calculate probability of
     :param mu: mean of distribuiton
     :param sig: standard deviation of distribution

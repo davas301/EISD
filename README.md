@@ -31,3 +31,24 @@ J. Am. Chem. Soc., 2016, 138 (13), pp 4530–4538.
 
 Please read the online documentation for more information and
  contact david.brookes@berkeley.edu with any questions.
+ 
+This program relies (or has relied in the past) on the SciPy, Scikit-learn,
+MMTK, and Biopython libraries, and uses the external program SHIFTX2. 
+These are cited in order below:
+
+* Jones E, Oliphant E, Peterson P, et al. SciPy: Open Source Scientific Tools 
+    for Python, 2001-
+
+* Scikit-learn: Machine Learning in Python, Pedregosa et al., JMLR 12, 
+    pp. 2825-2830, 2011.
+
+* Konrad Hinsen The Molecular Modeling Toolkit: A New Approach to Molecular Simulations
+  J. Comp. Chem. 21, 79-85 (2000)
+  
+* Peter J.A Cock, et al. Biopython: freely available Python tools for 
+computational molecular biology and bioinformatics. Bioinformatics (2009) 25 
+(11): 1422-1423
+
+* Beomsoo Han, Yifeng Liu, Simon Ginzinger, and David Wishart. "SHIFTX2:
+  significantly improved protein chemical shift prediction".
+  *Journal of Biomolecular NMR*, **2011**, 50 (1), pp 43-57.

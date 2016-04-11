@@ -41,43 +41,51 @@ Module for implementing back-calculators
 class BaseBackCalculator(object):
     """
     Abstract base class for back calculators
+
+    :param nparams: number of nuisance parameters
     """
 
     def __init__(self, nparams):
-        """
-        :param nparams: number of nuisance parameters
-        """
         self.nParams_ = nparams
 
     def get_err_sig(self, data_id):
         """
         Get error standard deviation for a data point
+
         :param data_id: DataID object for the data point
         """
         raise NotImplementedError
 
     def get_default_params(self):
         """
-        :return: default parameter values for this back-calculator
+        Get the default parameters for this back-calculator
+
+        :return: List of default values (one for each param)
         """
         raise NotImplementedError
 
     def get_random_params(self):
         """
-        :return: random parameter values for this back-calculator
+        Get values drawn randomly  from the distributions of this
+        back-calculator's parameters
+
+        :return: List of random values (one for each param)
         """
         raise NotImplementedError
 
     def get_random_err(self, data_id):
         """
+        Get a value drawn from the error distribution of this back-calculator
+
         :param data_id: a DataID object
-        :return: a random error taken from the distribution corresponding to
-        the input data id
+        :return: a random error taken from the distribution corresponding to the input data id
         """
         raise NotImplementedError
 
     def get_default_err(self, data_id):
         """
+        Get the default (i.e. most probable) error for this back-calculator
+
         :param data_id: a DataID object
         :return: the default error corresponding to the input data id
         """
@@ -86,6 +94,7 @@ class BaseBackCalculator(object):
     def logp_params(self, params):
         """
         Return the log probability of a set of parameter values
+
         :param params: list of input parameters for this back-calculator
         :return: log probability of the input parameters
         """
@@ -93,6 +102,8 @@ class BaseBackCalculator(object):
 
     def logp_err(self, err, data_id):
         """
+        Return the log probability of an error
+
         :param err: the error value
         :param data_id: the DataID corresponding to the input error
         :return: the log probability of the input error
@@ -103,6 +114,7 @@ class BaseBackCalculator(object):
         """
         Perform the back-calculation given a structural measurement and
         necessary parameters.
+
         :param xi: a Measurement returned by self.get_struct_data()
         :param params: list of nuisance parameter values for this back-calc
         :return: a Measurement object containing the back-calculated value
@@ -114,6 +126,7 @@ class BaseBackCalculator(object):
         Returns a default structural value for the relevant
         structural information needed by this back-calculator.
         Used to initialize models
+
         :return: default Measurement object
         """
         raise NotImplementedError
@@ -122,24 +135,21 @@ class BaseBackCalculator(object):
 class JCoupBackCalc(BaseBackCalculator):
     """
     Back calculator for J-coupling constants from dihedral angles
-    Calculation is done with the Karplus equation:
-        J(phi) = Acos^2(phi) + Bcos(phi) + C
+    Calculation is done with the Karplus equation: \$\$ J(\phi) = A\cos^2(\phi) + Bcos(\phi) + C \$\$
+    Constructor requires parameters for the Gaussian random variables
+    that will represent the coefficients in the Karplus equation
+    and a dictionary containing the errors mean and standard deviations
+    for every type of structural measurement. Default Karplus coeff means,
+    stdevs and and error stdev are the values based on those in:
+        Vuister and Bax, "Quantatative J Correlation: a new approach for meausuring homonuclear
+        three bond J coupling constants in N15 eriched proteins" *J.Am.Chem.Soc*, **1993**,
+        *115* (17). pp 7772:7777
     """
 
     def __init__(self, err_mu=0, err_sig=0.73, mu_a=6.51,
                  mu_b=-1.76, mu_c=1.60, sig_a=np.sqrt(0.14),
                  sig_b=np.sqrt(0.03), sig_c=np.sqrt(0.08)
                  ):
-        """
-        Constructor given parameters for the Gaussian random variables
-        that will represent the coefficients in the Karplus equation
-        and a dictionary containing the errors mean and standard deviations
-        for every type of structural measurement
-        Default Karplus coeff means, stdevs and and error stdev are the values
-        based on those in Vuister and Bax, "Quantatative J Correlation: a new
-        approach for meausuring homonuclear three bond J coupling constants in
-        N15 eriched proteins" J.Am.Chem.Soc 1993, 115(17): 7772:7777
-        """
         self.muParams_ = [mu_a, mu_b, mu_c]
         self.sigParams_ = [sig_a, sig_b, sig_c]
         self.errMu_ = err_mu
@@ -150,6 +160,7 @@ class JCoupBackCalc(BaseBackCalculator):
     def get_err_sig(self, data_id=None):
         """
         See BaseBackCalculator for more info
+
         :param data_id:
         :return:
         """
@@ -158,6 +169,7 @@ class JCoupBackCalc(BaseBackCalculator):
     def get_random_params(self):
         """
         See BaseBackCalculator for more info
+
         :return:
         """
         params = [0, 0, 0]
@@ -170,6 +182,7 @@ class JCoupBackCalc(BaseBackCalculator):
         """
         Parameters are represented as normals. See BaseBackCalculator for more
         info
+
         :param params:
         :return:
         """
@@ -183,6 +196,7 @@ class JCoupBackCalc(BaseBackCalculator):
         """
         data_id is optional for this back-calculator. See BaseBackCalculator for
         more info
+
         :param data_id:
         """
         return np.random.normal(loc=0, scale=self.errSig_)
@@ -190,6 +204,8 @@ class JCoupBackCalc(BaseBackCalculator):
     def get_default_params(self):
         """
         Return mean of param values. See BaseBackCalculator for more info
+
+        :return:
         """
         return self.muParams_
 
@@ -197,6 +213,7 @@ class JCoupBackCalc(BaseBackCalculator):
         """
         Default if mean of error distribution See BaseBackCalculator for more
         info
+
         :param data_id:
         :return:
         """
@@ -205,6 +222,7 @@ class JCoupBackCalc(BaseBackCalculator):
     def logp_err(self, err, data_id=None):
         """
         Error is represemted as a normal. See BaseBackCalculator for more info
+
         :param err:
         :param data_id:
         """
@@ -215,6 +233,7 @@ class JCoupBackCalc(BaseBackCalculator):
         """
         Implemenation of the Karplus equation. See BaseBackCalculator for more
         info
+
         :param xi:
         :param back_params:
         """
@@ -229,6 +248,7 @@ class JCoupBackCalc(BaseBackCalculator):
     def get_default_struct_val(self):
         """
         Default is [pi, pi] dihedral angle. See BaseBackCalculator for more info
+
         :return:
         """
         meas = Measurement(data_id=None,
@@ -250,6 +270,7 @@ class ShiftBackCalc(BaseBackCalculator):
         """
         No nuisance parameters required for this model. See BaseBackCalculator
         for more info
+
         :return:
         """
         return []
@@ -258,6 +279,7 @@ class ShiftBackCalc(BaseBackCalculator):
         """
         No nuisance parameters required for this model. See BaseBackCalculator
         for more info
+
         :return:
         """
         return []
@@ -267,6 +289,7 @@ class ShiftBackCalc(BaseBackCalculator):
         Return a random value from the normal distribution corresponding
         to the SHIFTX2 rmsd value for this data id. See BaseBackCalculator
         for more info
+
         :param data_id:
         :return:
         """
@@ -276,6 +299,7 @@ class ShiftBackCalc(BaseBackCalculator):
     def get_err_sig(self, data_id):
         """
         Get the std corresponding to the SHIFTX2 rmsd for this data id
+
         :param data_id:
         :return:
         """
@@ -287,6 +311,7 @@ class ShiftBackCalc(BaseBackCalculator):
         """
         No nuisance parameters required for this model. See BaseBackCalculator
         for more info
+
         :param params:
         :return:
         """
@@ -295,6 +320,7 @@ class ShiftBackCalc(BaseBackCalculator):
     def get_default_err(self, data_id=None):
         """
         Default is 0.0. See BaseBackCalculator for more info
+
         :param data_id:
         :return:
         """
@@ -304,6 +330,7 @@ class ShiftBackCalc(BaseBackCalculator):
         """
         Error represented as gaussian with std based on SHIFTX2 reported rmsd
         See BaseBackCalculator for more info
+
         :param err:
         :param data_id:
         :return:
@@ -317,6 +344,7 @@ class ShiftBackCalc(BaseBackCalculator):
         """
         In this case, xi contains the back-calculated measurement.
         See BaseBackCalculator for more info.
+
         :param xi:
         :param params:
         :return:
@@ -327,6 +355,7 @@ class ShiftBackCalc(BaseBackCalculator):
         """
         Return a shift id for the first measurement of the first
         structure
+
         :return:
         """
         return Measurement(data_id=None, val=None)

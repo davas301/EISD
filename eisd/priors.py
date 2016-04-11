@@ -1,6 +1,5 @@
 import numpy as np
 
-
 """
 Copyright (c) 2016, Teresa Head-Gordon and David Brookes
 All rights reserved.
@@ -45,6 +44,7 @@ class BasePrior(object):
         """
         Calculate the prior log probability for a list of Structures that make
         up an ensemble
+
         :param args: specific arguments
         :return: log probability of ensemble in this prior distribution
         """
@@ -55,6 +55,7 @@ class BasePrior(object):
         Build the arguments required to calculate the prior given a
         single structure. So the input to calc_prior_logp shoudl be a
         list of these args
+
         :param struct: a Structure object
         :return:
         """
@@ -64,18 +65,19 @@ class BasePrior(object):
 class UniformPrior(BasePrior):
     """
     Uniform prior distribuiton across space of ensembles
+
+    :param n: number of candidate ensembles
+
     """
 
     def __init__(self, n):
-        """
-        :param n: number of candidate ensembles
-        """
         self.n_ = n
         super(UniformPrior, self).__init__()
 
     def calc_prior_logp(self):
         """
-        Probability is just 1/self.n_. See BasePrior for more info
+        Probability is just 1/n. See BasePrior for more info
+
         :return:
         """
         return np.log(1. / self.n_)
@@ -83,10 +85,8 @@ class UniformPrior(BasePrior):
     def get_arg(self, struct=None):
         """
         No arguments for this prior. See BasePrior for more info
+
         :param struct: a Structure object
         :return: None
         """
         return None
-
-
-

@@ -62,7 +62,7 @@ class BaseDataID(object):
 class ShiftID(BaseDataID):
     """
     Storage objects containing information that identifies a unique chemical
-    shift. A shift is defined by a residue number and atom_ name
+    shift. A shift is defined by a residue number and atom name
     """
 
     def __init__(self, res_num, atom_name):
@@ -122,15 +122,14 @@ class Measurement(object):
 class RunShiftX(object):
     """
     Class for running the SHIFTX2 command line program
+
+    :param exe: path to SHIFTX2 executable
+    :param tempdir: path to a directory to story temporary files
     """
     DEFAULT_EXE = "/usr/local/bin/shiftx2/shiftx2.py"
     DEFAULT_TEMPDIR = "./tmp/"
 
     def __init__(self, exe=DEFAULT_EXE, tempdir=DEFAULT_TEMPDIR):
-        """
-        :param exe: path to SHIFTX2 executable
-        :param tempdir: path to a directory to story temporary files
-        """
         self.exe_ = exe
         self.tempdir_ = tempdir
 
@@ -138,6 +137,7 @@ class RunShiftX(object):
                         clean=True, no_output=True):
         """
         Runs SHIFTX2 for a single input pdb file
+
         :param inpath: path to input pdb file
         :param backbone_only: True if SHIFTX2 should only run for backbone atoms
         :param clean: True if the temporary files should be deleted
@@ -169,6 +169,7 @@ class RunShiftX(object):
     def read_ouput(f):
         """
         Reads a shiftx2 output file
+
         :param f: output file to be read
         :return: {ShiftID: shift_val} dict
         """
@@ -190,6 +191,7 @@ def write_dihed_to_file(structs, outname, verbose=True):
     Write the dihedral angles of a list of structures into a tab-separated
     file where each line represents a single structure and the columns
     alternate phi, psi angles for each residue
+
     :param structs: list of Structure objects
     :param outname: path to where the dihed file should be written
     :param verbose: If True updates will be written to terminal
@@ -224,6 +226,7 @@ def write_dihed_to_file(structs, outname, verbose=True):
 def read_dihed_file(path):
     """
     Read the dihedral angle file written by write_dihed_to_file
+
     :param path:
     :return: numpy array containg dihedral angles
     """
@@ -246,10 +249,11 @@ def read_dihed_file(path):
 
 def get_ab42_jcoup_data():
     """
-    Read the J-coupling data for aB42
+    Read the J-coupling data for aB42 in ../test_data/
+
     :return: a {JCoupID: val} dict
     """
-    jcoup_data_path = "../test_data/bax_2016_jcoup.txt"
+    jcoup_data_path = "../test/bax_2016_jcoup.txt"
     jcoup_data = {}
     expf = open(jcoup_data_path)
     lines = expf.readlines()
@@ -266,10 +270,11 @@ def get_ab42_jcoup_data():
 
 def get_ab42_shift_data():
     """
-    Read the shift data for aB42
+    Read the shift data for aB42 in ../test_data/
+
     :return: a {ShiftID: val} dict
     """
-    shift_data_path = "../test_data/filtered_ab42_cs.txt"
+    shift_data_path = "../test/filtered_ab42_cs.txt"
     shift_data = {}
     expf = open(shift_data_path)
     lines = expf.readlines()
@@ -288,7 +293,8 @@ def get_ab42_shift_data():
 def get_md_energies():
     """
     Read the energy file containing all the energies for the
-    MD ensemble
+    MD ensemble in in ../test_data/
+
     :return: {filename: energy} dict
     """
     path = "test_data/MD_energies.txt"

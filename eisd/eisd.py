@@ -45,24 +45,21 @@ Module for performing EISD calculation
 class DataEISD(object):
     """
     Implementation of the Experimental Inferential Structure Determination
-    model that does not include prior probabilities (priors should be
+    model. This does not include prior probabilities (priors should be
     calculated separately). Each DataEISD object calculates probabilities
     for one data type
+
+    :param back_calc: BaseBackCalculator object
+    :param exp_data: experimental data corresponding to back-calc
+    :param no_exp_err: True if experimental error should not contribute
+    :param no_params: True if parameter probabilities should not contribute
+    :param no_bc_err: True if back-calculation error should not contribute
+    :param no_opt: True if no optimization should be performed--just calculate error probability from normal
     """
 
     def __init__(self, back_calc, exp_data,
                  no_exp_err=False, no_params=False,
                  no_bc_err=False, no_opt=False):
-        """
-        :param back_calc: BaseBackCalculator object
-        :param exp_data: experimental data corresponding to back-calc
-        :param no_exp_err: True if experimental error should not contribute
-        :param no_params: True if parameter probabilities should not contribute
-        :param no_bc_err: True if back-calculation error should not contribute
-        :param no_opt: True if no optimization should be performed--just
-        calculate error probability from normal
-        """
-
         self.backCalc_ = back_calc
 
         self.M_ = len(exp_data)
@@ -82,6 +79,7 @@ class DataEISD(object):
     def compute_all_back_calc(self, structs, bc_params, j):
         """
         Perform back-calculation on every input structure for data point j
+
         :param structs: list of Structure objects
         :param bc_params: input parameters for back-calculator
         :param j: index of data point to back-calculate for
@@ -97,6 +95,7 @@ class DataEISD(object):
     def compute_back_calc_mean(self, structs, bc_params, j):
         """
         Compute mean of back-calculation on input structures for data point j
+
         :param structs: list of Structure objects
         :param bc_params: input parameters for back-calculator
         :param j: index of data point to back-calculate for
@@ -107,6 +106,7 @@ class DataEISD(object):
     def _logp_params(self, value):
         """
         Calculate the log probability of back-calculator parameters
+
         :param value: back-calculator parameters
         :return: log probability of parameters
         """
@@ -114,7 +114,8 @@ class DataEISD(object):
 
     def _random_params(self):
         """
-        See BaseBackCalculator for more infor
+        See BaseBackCalculator for more info
+
         :return: random parameter set
         """
         return self.backCalc_.get_random_params()
@@ -125,6 +126,7 @@ class DataEISD(object):
         at data point j assuming the error distribution is a normal with
         variance equal to the sum of the experimental and back-calculator
         error variances
+
         :param value: value of error
         :param j: index of data point
         :return: log probability
@@ -135,6 +137,7 @@ class DataEISD(object):
     def _logp_exp_err(self, value, j):
         """
         Log probability of experimental error
+
         :param value: error value
         :param j: index of experimental data point
         :return: log probability
@@ -144,6 +147,7 @@ class DataEISD(object):
     def _logp_bc_err(self, value, j):
         """
         Log probability of back-calculation error
+
         :param value: value of error
         :param j: index of data point
         :return: log probability
@@ -153,6 +157,7 @@ class DataEISD(object):
     def _random_exp_err(self, j):
         """
         Return a random experimental error
+
         :param j: index of experimental data point
         :return: random error
         """
@@ -161,6 +166,7 @@ class DataEISD(object):
     def _random_bc_err(self, j):
         """
         Return a random back-calculator error
+
         :param j: index of data point
         :return: random error
         """
@@ -171,6 +177,7 @@ class DataEISD(object):
         Given a list of structures,  bc_err, params and a data point index,
         return the experimental error at the data point. This essentially
         implements equation 5 in Brookes (2016).
+
         :param structs: list of Structure objects
         :param params: back-calc parameters
         :param bc_err: back-calculation error
@@ -185,6 +192,7 @@ class DataEISD(object):
         """
         Calculate the full EISD log probability given an ensemble
         :param structs: list of Structure objects
+
         :return: log probability
         """
         logp_total = 0
@@ -196,6 +204,7 @@ class DataEISD(object):
                     """
                     Calculate the logp of a single data point. Used
                     as input to scipy optimization
+
                     :param x: inputs
                     :return: -logp ( because max(f)=-min(-f) )
                     """
@@ -233,19 +242,18 @@ class DataEISD(object):
 class EISDOPT(object):
     """
     Class for optimizing an ensemble based on EISD probabilities
+
+    :param pdb_dir: path to full ensemble of pdb structures
+    :param prior: a BasePrior object
+    :param data_eisds: list of DataEISD objects
+    :param savefile: file to save best ensemble to (list of pdb names)
+    :param subsize: size of sub-ensemble to optimize
+    :param verbose: if True, will print updates
+    :param stats_file: file to save statistics to (optional)
     """
 
     def __init__(self, pdb_dir, prior, data_eisds, savefile, subsize=1000,
                  verbose=True, stats_file=None):
-        """
-        :param pdb_dir: path to full ensemble of pdb structures
-        :param prior: a BasePrior object
-        :param data_eisds: list of DataEISD objects
-        :param savefile: file to save best ensemble to (list of pdb names)
-        :param subsize: size of sub-ensemble to optimize
-        :param verbose: if True, will print updates
-        :param stats_file: file to save statistics to (optional)
-        """
         self.pdbDir_ = pdb_dir
         self.allPDB_ = [f for f in os.listdir(self.pdbDir_) if
                         ".pdb" in f and ".cs" not in f]
@@ -270,6 +278,7 @@ class EISDOPT(object):
     def _build_start_set(self):
         """
         Build a random start set of structures
+
         :return: list of files and list of Structure objects
         """
         state_files = list(np.random.choice(self.allPDB_, size=self.Nsub_,
@@ -324,6 +333,7 @@ class EISDOPT(object):
     def _calc_data_prob(self):
         """
         Calculate the probability of the data for the current set of structures
+
         :return: probability of data
         """
         e = 0
@@ -338,6 +348,7 @@ class EISDOPT(object):
     def default_cool(t):
         """
         Default cooling schedule for simulated annealing
+
         :param t: fraction of iterations
         :return: "Temperature" for simulated annealing
         """
@@ -349,6 +360,7 @@ class EISDOPT(object):
         that maximimizes probability. Requires the number of iterations and
         the cooling schedule, which is a callable function that takes the
         current fraction of iterations performed
+
         :param niter: number of iterations
         :param cool_sched: callable cooling schedule function
         """

@@ -44,17 +44,13 @@ class Structure(object):
     """
     Class for representing and modifying protein structures. Interfaces
     significantly with MMTK.
+
+    :param pdbfile: path to the pdbfile containing the representation of this structure
+    :param shiftxfile: file containing back-calculated SHIFTX2 data for this structure
+    :param runshiftx: an optional RunShiftX instance
     """
 
     def __init__(self, pdbfile, shiftxfile=None, runshiftx=None, energy=None):
-        """
-
-        :param pdbfile: path to the pdbfile containing the representation of
-        this structure
-        :param shiftxfile: file containing back-calculated SHIFTX2 data for
-        this structure
-        :param runshiftx: an optional RunShiftX instance
-        """
         self.pdb_ = pdbfile.split('/')[-1]  # only want the name of the pdb
 
         parser = Bio.PDB.PDBParser()
@@ -103,6 +99,7 @@ class Structure(object):
     def _get_all_dihed(self):
         """
         Retrieve all phi, psi dihedral angles in this structure
+
         :return: a {res_num: (phi, psi)} dict
         """
         phi_psi = self.protein_.get_phi_psi_list()
@@ -120,6 +117,7 @@ class Structure(object):
         Get a structural measurement from a DataID corresponding to an
         experimental measurement. This structural measurement can be
         input into a back-calculator
+
         :param exp_id: An experimental data ID (ShiftID or JCoupID)
         """
         if isinstance(exp_id, ShiftID):

@@ -2,12 +2,11 @@ import os
 
 import numpy as np
 
-import readutil
-from backcalc import JCoupBackCalc, ShiftBackCalc
-from eisd import DataEISD, EISDOPT
-from priors import UniformPrior
-# from priors2 import En
-from structure import Structure
+import eisd.readutil
+from eisd.backcalc import JCoupBackCalc, ShiftBackCalc
+from eisd.eisd import DataEISD, EISDOPT
+from eisd.priors import UniformPrior
+from eisd.structure import Structure
 
 """
 Copyright (c) 2016, Teresa Head-Gordon and David Brookes
@@ -49,6 +48,7 @@ def test_ensemble(pdbdir):
     """
     Example program showing how to calculate the probability of an ensemble
     with some EISD and prior
+
     :param pdbdir: directory of pdb files for this ensemble
     :return: probability of ensemble
     """
@@ -60,7 +60,7 @@ def test_ensemble(pdbdir):
     structs = [Structure(f) for f in all_paths]
 
     # get data: (example is j-coupling data for AB42)
-    exp_data = readutil.get_ab42_jcoup_data()
+    exp_data = eisd.readutil.get_ab42_jcoup_data()
 
     # build back-calculator and  data eisd calculator:
     back_calc = JCoupBackCalc()
@@ -97,9 +97,9 @@ def optimize_ensemble():
     prior = UniformPrior(1)
 
     # build DataEISD objects
-    jcoup_eisd = DataEISD(JCoupBackCalc(), readutil.get_ab42_jcoup_data(),
+    jcoup_eisd = DataEISD(JCoupBackCalc(), eisd.readutil.get_ab42_jcoup_data(),
                           no_bc_err=True, no_opt=True)
-    shift_eisd = DataEISD(ShiftBackCalc(), readutil.get_ab42_shift_data(),
+    shift_eisd = DataEISD(ShiftBackCalc(), eisd.readutil.get_ab42_shift_data(),
                           no_opt=True)
     data_eisds = [jcoup_eisd, shift_eisd]
 
@@ -107,6 +107,7 @@ def optimize_ensemble():
     def cool_sched(t):
         """
         Cooling schedule
+
         :param t: fraction of iterations
         :return: "Temperature" for simulated annealing
         """
@@ -121,8 +122,4 @@ def optimize_ensemble():
     niter = int(1e5)
     optimizer.opt(niter, cool_sched=cool_sched)
 
-
-
-
-test_ensemble("/Users/davidbrookes/data/pdb_J2_2")
 
