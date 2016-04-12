@@ -46,11 +46,11 @@ $ pip install biopython
 
 Next, clone the git repository::
 
-$ git clone https://github.com/davas301/EISD.git
+$ git clone https://github.com/davas301/eisd.git
 
 Now navigate to the downloaded directory and run the setup tool::
 
-$ cd EISD/
+$ cd eisd/
 $ python setup.py
 
 The EISD modules can now be imported into any local python program.
