@@ -63,6 +63,9 @@ class ShiftID(BaseDataID):
     """
     Storage objects containing information that identifies a unique chemical
     shift. A shift is defined by a residue number and atom name
+
+    :param res_num: residue number of measurement
+    :param atom_name: name of atom with residue
     """
 
     def __init__(self, res_num, atom_name):
@@ -89,6 +92,8 @@ class ShiftID(BaseDataID):
 class JCoupID(BaseDataID):
     """
     ID objects for j coupling values. Only requires a residue number
+
+    :param res_num: residue number of measurement
     """
 
     def __init__(self, res_num):
@@ -112,6 +117,9 @@ class Measurement(object):
     """
     Class for storing all of the info in a data measurement
     (experimental or structural). Contains a data ID and a value
+
+    :param data_id: a BaseDataID object
+    :param val: value of the measurement
     """
 
     def __init__(self, data_id=None, val=None):

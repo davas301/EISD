@@ -91,9 +91,6 @@ def optimize_ensemble():
     pdbdir = "/Users/davidbrookes/data/pdb_J2_2"
     subset_size = 1000
 
-    # build prior
-    # pdb_energy_dict = readutil.get_md_energies()
-    # ref_energies = pdb_energy_dict.values()
     prior = UniformPrior(1)
 
     # build DataEISD objects
