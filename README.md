@@ -29,8 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 This repository contains an implementation of the procedures outlined in 
 J. Am. Chem. Soc., 2016, 138 (13), pp 4530–4538.
 
-Please read the online documentation for more information and
- contact david.brookes@berkeley.edu with any questions.
+Please read the online documentation at http://eisd.readthedocs.org/en/latest/
+for more information and contact david.brookes@berkeley.edu with any questions.
  
 This program relies (or has relied in the past) on the SciPy, Scikit-learn,
 MMTK, and Biopython libraries, and uses the external program SHIFTX2. 
