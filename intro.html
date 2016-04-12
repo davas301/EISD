@@ -1,0 +1,241 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Getting Started &mdash; EISD 0.1 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="EISD 0.1 documentation" href="index.html"/>
+        <link rel="next" title="Use" href="use.html"/>
+        <link rel="prev" title="Welcome!" href="index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+          <a href="index.html" class="fa fa-home"> EISD</a>
+        
+        
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+          
+          
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="use.html">Use</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="use.html#calculating-eisd-probabilities">Calculating EISD probabilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="use.html#finding-optimal-subsets">Finding optimal subsets</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#module-eisd">eisd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#module-backcalc">backcalc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#module-priors">priors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#module-structure">structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#module-readutil">readutil</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#module-util">util</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+          
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">EISD</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Getting Started</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="sources/intro.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document">
+            
+  <div class="section" id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>Welcome to EISD! Short for Experimental Inferential Structure
+Determination, EISD was developed in Teresa Head-Gordon&#8217;s lab at
+UC Berkeley with the goal of providing probability scores to ensembles of
+Intrinsically Disordered Proteins (IDPs) based on their fit to experimental
+data and conformational prior distributions. The theory underlying this
+code is presented in <a class="reference internal" href="references.html#brhe16" id="id1">[BrHe16]</a>.</p>
+<p>EISD currently allows one to determine probabilities of ensembles using
+a number of different experimental data types and priors, as well as to
+optimize an ensemble by finding the subset of structures with the highest
+probability.</p>
+</div>
+<div class="section" id="dependencies">
+<h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
+<p>EISD relies on a number of Python libraries and external programs, listed
+below:</p>
+<ul class="simple">
+<li><strong>SciPy</strong> <a class="reference internal" href="references.html#joop01" id="id2">[JoOP01]</a></li>
+<li><strong>Biopython</strong> <a class="reference internal" href="references.html#cacc09" id="id3">[CACC09]</a></li>
+<li><strong>SHIFTX2</strong> <a class="reference internal" href="references.html#blgw11" id="id4">[BLGW11]</a></li>
+</ul>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>To install EISD, one must first install the dependencies above. This is most
+easily done with the <code class="code docutils literal"><span class="pre">pip</span></code> tool, which can be installed by following the
+instructions <a class="reference external" href="https://pip.pypa.io/en/stable/installing/">here</a>. Then type on the command line:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ pip install numpy
+$ pip install sklearn
+$ pip install biopython
+</pre></div>
+</div>
+<p>Next, clone the git repository:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ git clone https://github.com/davas301/eisd.git
+</pre></div>
+</div>
+<p>Now navigate to the downloaded directory and run the setup tool:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ cd eisd/
+$ python setup.py
+</pre></div>
+</div>
+<p>The EISD modules can now be imported into any local python program.</p>
+<p>Users may also want to install <strong>SHIFTX2</strong> for chemical shift prediction, whose download and installation
+instructions can be found on <a class="reference external" href="&quot;http://www.shiftx2.ca/&quot;">their website</a></p>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="use.html" class="btn btn-neutral float-right" title="Use">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="Welcome!"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, David Brookes and Teresa Head-Gordon.
+    </p>
+  </div>
+
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="static/jquery.js"></script>
+      <script type="text/javascript" src="static/underscore.js"></script>
+      <script type="text/javascript" src="static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
