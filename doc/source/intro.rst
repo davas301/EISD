@@ -50,7 +50,7 @@ $ git clone https://github.com/davas301/EISD.git
 
 Now navigate to the downloaded directory and run the setup tool::
 
-$ cd eisd/
+$ cd EISD/
 $ python setup.py
 
 The EISD modules can now be imported into any local python program.
