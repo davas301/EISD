@@ -2,7 +2,6 @@ import glob
 import os
 import subprocess
 import time
-
 import numpy as np
 
 """
@@ -305,7 +304,7 @@ def get_md_energies():
 
     :return: {filename: energy} dict
     """
-    path = "test_data/MD_energies.txt"
+    path = "../test/MD_energies.txt"
     f = open(path)
     lines = f.readlines()
     f.close()
@@ -317,3 +316,19 @@ def get_md_energies():
         energy = float(split[1])
         edict[fname] = energy
     return edict
+
+
+def read_opt_out_file(path):
+    """
+    Read the output of an optimization run
+    :param path: path to the optimization output file
+    :return: list of pdb files of representing optimized ensemble
+    """
+    f = open(path)
+    lines = f.readlines()
+    f.close()
+    files = []
+    iter = int(lines[0].split()[-1])
+    for line in lines[1:]:
+        files.append(line.split()[0].strip('\n').strip(".cs"))
+    return files, iter

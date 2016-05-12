@@ -1,5 +1,4 @@
-# from MMTK.PDB import PDBConfiguration
-# from MMTK.Proteins import Protein
+
 import Bio.PDB
 from readutil import RunShiftX, Measurement
 from readutil import ShiftID

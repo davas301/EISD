@@ -6,6 +6,7 @@ import scipy.optimize as opt
 
 from structure import Structure
 from util import normal_loglike
+from readutil import read_opt_out_file
 
 """
 Copyright (c) 2016, Teresa Head-Gordon and David Brookes
@@ -54,7 +55,8 @@ class DataEISD(object):
     :param no_exp_err: True if experimental error should not contribute
     :param no_params: True if parameter probabilities should not contribute
     :param no_bc_err: True if back-calculation error should not contribute
-    :param no_opt: True if no optimization should be performed--just calculate error probability from normal
+    :param no_opt: True if no optimization should be performed--just calculate
+    error probability from normal
     """
 
     def __init__(self, back_calc, exp_data,
@@ -253,7 +255,7 @@ class EISDOPT(object):
     """
 
     def __init__(self, pdb_dir, prior, data_eisds, savefile, subsize=1000,
-                 verbose=True, stats_file=None):
+                 verbose=True, stats_file=None, restartfile=None):
         self.pdbDir_ = pdb_dir
         self.allPDB_ = [f for f in os.listdir(self.pdbDir_) if
                         ".pdb" in f and ".cs" not in f]
@@ -266,23 +268,29 @@ class EISDOPT(object):
         self.prior_ = prior
         self.dataEISDs_ = data_eisds
 
-        build_tup = self._build_start_set()
-        self.stateFiles_, self.stateStructs_ = build_tup
+        build_tup = self._build_start_set(restartfile=restartfile)
+        self.stateFiles_, self.stateStructs_, self.startIter_ = build_tup
         self.priorArgs_ = [self.prior_.get_arg(s) for s in self.stateStructs_]
+        # print self.priorArgs_
 
         # save last removed things for restoration:
         self.lastRemoveFile_ = None
         self.lastRemoveStruct_ = None
         self.lastRemovePrior_ = None
 
-    def _build_start_set(self):
+    def _build_start_set(self, restartfile=None):
         """
         Build a random start set of structures
 
         :return: list of files and list of Structure objects
         """
-        state_files = list(np.random.choice(self.allPDB_, size=self.Nsub_,
-                                            replace=False))
+        if restartfile is None:
+            state_files = list(np.random.choice(self.allPDB_, size=self.Nsub_,
+                                                replace=False))
+            start_iter = 0
+        else:
+            state_files, start_iter = read_opt_out_file(restartfile)
+
         state_structs = [None] * self.Nsub_
         for i in range(len(state_files)):
             f = state_files[i]
@@ -294,7 +302,7 @@ class EISDOPT(object):
                     print "Number of structures built: %i / % i" % (
                         i, self.Nsub_)
 
-        return state_files, state_structs
+        return state_files, state_structs, start_iter
 
     def _perturb(self):
         """
@@ -314,7 +322,7 @@ class EISDOPT(object):
         rand_add_struct = Structure(os.path.join(self.pdbDir_, rand_add_file),
                                     shiftxfile=rand_cs_file)
 
-        self.stateFiles_.append(rand_cs_file)
+        self.stateFiles_.append(rand_add_file)
         self.stateStructs_.append(rand_add_struct)
         self.priorArgs_.append(self.prior_.get_arg(rand_add_struct))
 
@@ -375,21 +383,24 @@ class EISDOPT(object):
             print stats_str
 
         if self.fstats_ is not None:
-            statsf = open(self.fstats_, 'w')
+            statsf = open(self.fstats_, 'w+')
             statsf.write(stats_str + "\n")
 
         # determine starting energy and prior scale parameter
         prior0 = self.prior_.calc_prior_logp(self.priorArgs_)
         data0, indi0 = self._calc_data_prob()
-        theta = data0 / prior0  # scale prior by theta
+        theta = 0.05 * (data0 / prior0)  # scale prior by theta
         e0 = data0 + theta * prior0
 
         abs_min = [e0, self.stateFiles_]
-        for i in range(niter):
+        for i in range(self.startIter_, niter):
             start = time.time()  # keep track of step time
             self._perturb()
             data1, indi1 = self._calc_data_prob()
             prior1 = self.prior_.calc_prior_logp(self.priorArgs_)
+            if prior1 < 0:
+                self._restore()
+                continue
             e1 = data1 + theta * prior1
 
             dE = e0 - e1
