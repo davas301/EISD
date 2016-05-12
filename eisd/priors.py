@@ -74,10 +74,10 @@ class UniformPrior(BasePrior):
         self.n_ = n
         super(UniformPrior, self).__init__()
 
-    def calc_prior_logp(self):
+    def calc_prior_logp(self, arg=None):
         """
         Probability is just 1/n. See BasePrior for more info
-
+        :param arg: placeholder argument to assure inheritance works correctly
         :return:
         """
         return np.log(1. / self.n_)

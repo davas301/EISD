@@ -1,12 +1,11 @@
 import os
-
 import numpy as np
-
 import eisd.readutil
 from eisd.backcalc import JCoupBackCalc, ShiftBackCalc
 from eisd.eisd import DataEISD, EISDOPT
-from eisd.priors import UniformPrior
+from eisd.priors import UniformPrior, EnergyPrior, QuasiHarmonicPrior
 from eisd.structure import Structure
+import matplotlib.pyplot as plt
 
 """
 Copyright (c) 2016, Teresa Head-Gordon and David Brookes
@@ -120,3 +119,38 @@ def optimize_ensemble():
     optimizer.opt(niter, cool_sched=cool_sched)
 
 
+def test_prior(ptype='qh'):
+    if ptype == 'qh':
+        ref_array = eisd.readutil.read_dihed_file("../test/MD_dihed.txt")
+        prior = QuasiHarmonicPrior(ref_array)
+    else:
+        ref_array = eisd.readutil.get_md_energies()
+        prior = EnergyPrior(ref_array)
+
+    subsize = [100, 200, 500, 1000, 2000, 5000, 10000, len(ref_array)]
+    x = []
+    y = []
+    for ss in subsize:
+        for i in range(100):
+            rand_idx = np.random.randint(0, ref_array.shape[0], size=ss)
+            test_array = [ref_array[j] for j in rand_idx]
+            kl = prior.calc_prior_logp(test_array)
+            x.append(ss)
+            y.append(kl)
+
+            print ss, i, kl
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+
+    ax.scatter(np.log(x), np.log(y), facecolor='w', alpha=0.5)
+    ax.set_xticks(np.log(subsize))
+    ax.set_xticklabels(subsize)
+
+    ax.set_xlabel("Subset Size")
+    ax.set_ylabel("$\log D(p_{sub} || p_0 )$")
+    plt.tight_layout()
+    plt.savefig('../output/md_%s_test.pdf' % ptype)
+
+
+test_prior(ptype='en')
