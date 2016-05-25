@@ -7,6 +7,7 @@ import scipy.optimize as opt
 from structure import Structure
 from util import normal_loglike
 
+
 """
 Copyright (c) 2016, Teresa Head-Gordon and David Brookes
 All rights reserved.
@@ -75,6 +76,7 @@ class DataEISD(object):
         self.noParams_ = no_params
         self.noBackErr_ = no_bc_err
         self.noOpt_ = no_opt
+        self.lastOptParams_ = [None] * self.M_  # save optimization result
 
     def compute_all_back_calc(self, structs, bc_params, j):
         """
@@ -199,7 +201,6 @@ class DataEISD(object):
         params = self.backCalc_.get_default_params()
         for j in range(self.M_):
             if not self.noOpt_:
-
                 def calc_logp_j(x):
                     """
                     Calculate the logp of a single data point. Used
@@ -223,10 +224,16 @@ class DataEISD(object):
                     _logp_j += self._logp_params(_params)
                     return -_logp_j
 
-                x0_j = self._random_params()
-                if not self.noBackErr_:
-                    x0_j.append(self._random_bc_err(j))
-                opt_result = opt.minimize(calc_logp_j, x0_j, method='Powell')
+                if self.lastOptParams_[j] is None:
+                    x0_j = self._random_params()
+                    if not self.noBackErr_:
+                        x0_j.append(self._random_bc_err(j))
+                else:
+                    x0_j = self.lastOptParams_[j]
+
+                meth = 'SLSQP'
+                opt_result = opt.minimize(calc_logp_j, x0_j, method=meth)
+
                 logp_opt_j = -opt_result.fun
                 logp_total += logp_opt_j
 
