@@ -53,13 +53,12 @@ class DataEISD(object):
     :param no_exp_err: True if experimental error should not contribute
     :param no_params: True if parameter probabilities should not contribute
     :param no_bc_err: True if back-calculation error should not contribute
-    :param no_opt: True if no optimization should be performed--just calculate
-    error probability from normal
+    :param no_opt: True if parameters should be found analytically (default)
     """
 
     def __init__(self, back_calc, exp_data,
                  no_exp_err=False, no_params=False,
-                 no_bc_err=False, no_opt=False):
+                 no_bc_err=False, no_opt=True):
         self.backCalc_ = back_calc
 
         self.M_ = len(exp_data)
@@ -75,8 +74,6 @@ class DataEISD(object):
         self.noParams_ = no_params
         self.noBackErr_ = no_bc_err
         self.noOpt_ = no_opt
-
-        self.lastOptParams_ = [None] * self.M_
 
     def get_all_struct_measures(self, structs, j):
         """
@@ -207,65 +204,48 @@ class DataEISD(object):
         :return: log probability
         """
         logp_total = 0
-        params = self.backCalc_.get_default_params()
+        # params = self.backCalc_.get_default_params()
         for j in range(self.M_):
             if not self.noOpt_:
-                # def calc_logp_j(x):
-                #     """
-                #     Calculate the logp of a single data point. Used
-                #     as input to scipy optimization
-                #
-                #     :param x: inputs
-                #     :return: -logp ( because max(f)=-min(-f) )
-                #     """
-                #     # start = time.time()
-                #     for i in range(len(x)):
-                #         if np.isnan(x[i]) or np.isinf(x[i]):
-                #             return np.inf
-                #     _params = x[:self.backCalc_.nParams_]
-                #     if not self.noBackErr_:
-                #         bc_err = x[-1]
-                #     else:
-                #         bc_err = 0
-                #
-                #     exp_err = self._eval(structs, _params, bc_err, j)
-                #     _logp_j = self._logp_exp_err(exp_err, j)
-                #     if not self.noBackErr_:
-                #         _logp_j += self._logp_bc_err(bc_err, j)
-                #     _logp_j += self._logp_params(_params)
-                #     # print time.time() - start
-                #     return -_logp_j
-                #
-                # if self.lastOptParams_[j] is None:
-                #     x0_j = self._random_params()
-                #     if not self.noBackErr_:
-                #         x0_j.append(self._random_bc_err(j))
-                # else:
-                #     x0_j = self.lastOptParams_[j]
-                # #
-                # # start = time.time()
-                # opt_result = opt.minimize(calc_logp_j, x0_j)
-                # print opt_result.x, opt_result.fun
-                # # print opt_result.nfev
-                # print "Opt time: %f" % (time.time() - start)
-                # print opt_result.x
-                #
-                # start = time.time()
+                def calc_logp_j(x):
+                    """
+                    Calculate the logp of a single data point. Used
+                    as input to scipy optimization
+
+                    :param x: inputs
+                    :return: -logp ( because max(f)=-min(-f) )
+                    """
+                    # start = time.time()
+                    for i in range(len(x)):
+                        if np.isnan(x[i]) or np.isinf(x[i]):
+                            return np.inf
+                    _params = x[:self.backCalc_.nParams_]
+                    if not self.noBackErr_:
+                        bc_err = x[-1]
+                    else:
+                        bc_err = 0
+
+                    exp_err = self._eval(structs, _params, bc_err, j)
+                    _logp_j = self._logp_exp_err(exp_err, j)
+                    if not self.noBackErr_:
+                        _logp_j += self._logp_bc_err(bc_err, j)
+                    _logp_j += self._logp_params(_params)
+                    # print time.time() - start
+                    return -_logp_j
+
+                x0_j = self._random_params()
+                if not self.noBackErr_:
+                    x0_j.append(self._random_bc_err(j))
+                opt_result = opt.minimize(calc_logp_j, x0_j)
+                logp_opt_j = -opt_result.fun
+                logp_total += logp_opt_j
+
+            else:
                 opt_params, f = self.backCalc_.calc_opt_params(
                     self.get_all_struct_measures(structs, j),
                     self.expSigs_[j], self.D_[j])
-                # print opt_params, f
-
-                # logp_opt_j = -opt_result.fun
                 logp_opt_j = f
                 logp_total += logp_opt_j
-                # print
-
-            else:
-                bc_val = self.compute_back_calc_mean(structs, params, j)
-                err = self.D_[j] - bc_val
-                logp_j = self._logp_total_err(err, j)
-                logp_total += logp_j
 
         return logp_total
 
@@ -376,12 +356,12 @@ class EISDOPT(object):
         e = 0
         indi = [0] * len(self.dataEISDs_)
         for i in range(len(self.dataEISDs_)):
-            start = time.time()
+            # start = time.time()
             ei = self.dataEISDs_[i].calc_logp(self.stateStructs_)
-            print time.time() - start
+            # print time.time() - start
             indi[i] = ei
             e += ei
-        print
+        # print
         return e, indi
 
     @staticmethod
@@ -465,12 +445,12 @@ class EISDOPT(object):
             else:
                 self._restore()
 
-            stats_str = "%i\t%s\t%f\t%f\t%f\t%f\t%f\t%fs" % (
-                i, did_accept, e1, prior1, indi1[0], indi1[1], p_a,
+            stats_str = "%i\t%s\t%f\t%f\t%f\t\t%f\t%fs" % (
+                i, did_accept, e1, prior1, indi1[0], p_a,
                 time.time() - start
             )
 
             if self.verbose_:
                 print stats_str
-            if self.fstats_ is not None:
-                statsf.write(stats_str + "\n")
+            # if self.fstats_ is not None:
+                # statsf.write(stats_str + "\n")
