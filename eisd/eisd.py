@@ -1,9 +1,7 @@
 import os
 import time
-
 import numpy as np
 import scipy.optimize as opt
-
 from structure import Structure
 from util import normal_loglike
 from readutil import read_opt_out_file
@@ -77,6 +75,18 @@ class DataEISD(object):
         self.noParams_ = no_params
         self.noBackErr_ = no_bc_err
         self.noOpt_ = no_opt
+
+        self.lastOptParams_ = [None] * self.M_
+
+    def get_all_struct_measures(self, structs, j):
+        """
+        Get all structural measurements for data point j
+        :param structs: list of structures
+        :param j: index of data point
+        :return: list of Measurement objects
+        """
+        lout = [si.get_struct_measure(self.expKeys_[j]) for si in structs]
+        return lout
 
     def compute_all_back_calc(self, structs, bc_params, j):
         """
@@ -194,43 +204,62 @@ class DataEISD(object):
         """
         Calculate the full EISD log probability given an ensemble
         :param structs: list of Structure objects
-
         :return: log probability
         """
         logp_total = 0
         params = self.backCalc_.get_default_params()
         for j in range(self.M_):
             if not self.noOpt_:
+                # def calc_logp_j(x):
+                #     """
+                #     Calculate the logp of a single data point. Used
+                #     as input to scipy optimization
+                #
+                #     :param x: inputs
+                #     :return: -logp ( because max(f)=-min(-f) )
+                #     """
+                #     # start = time.time()
+                #     for i in range(len(x)):
+                #         if np.isnan(x[i]) or np.isinf(x[i]):
+                #             return np.inf
+                #     _params = x[:self.backCalc_.nParams_]
+                #     if not self.noBackErr_:
+                #         bc_err = x[-1]
+                #     else:
+                #         bc_err = 0
+                #
+                #     exp_err = self._eval(structs, _params, bc_err, j)
+                #     _logp_j = self._logp_exp_err(exp_err, j)
+                #     if not self.noBackErr_:
+                #         _logp_j += self._logp_bc_err(bc_err, j)
+                #     _logp_j += self._logp_params(_params)
+                #     # print time.time() - start
+                #     return -_logp_j
+                #
+                # if self.lastOptParams_[j] is None:
+                #     x0_j = self._random_params()
+                #     if not self.noBackErr_:
+                #         x0_j.append(self._random_bc_err(j))
+                # else:
+                #     x0_j = self.lastOptParams_[j]
+                # #
+                # # start = time.time()
+                # opt_result = opt.minimize(calc_logp_j, x0_j)
+                # print opt_result.x, opt_result.fun
+                # # print opt_result.nfev
+                # print "Opt time: %f" % (time.time() - start)
+                # print opt_result.x
+                #
+                # start = time.time()
+                opt_params, f = self.backCalc_.calc_opt_params(
+                    self.get_all_struct_measures(structs, j),
+                    self.expSigs_[j], self.D_[j])
+                # print opt_params, f
 
-                def calc_logp_j(x):
-                    """
-                    Calculate the logp of a single data point. Used
-                    as input to scipy optimization
-
-                    :param x: inputs
-                    :return: -logp ( because max(f)=-min(-f) )
-                    """
-                    for i in range(len(x)):
-                        if np.isnan(x[i]) or np.isinf(x[i]):
-                            return np.inf
-                    _params = x[:self.backCalc_.nParams_]
-                    if not self.noBackErr_:
-                        bc_err = x[-1]
-                    else:
-                        bc_err = 0
-                    exp_err = self._eval(structs, _params, bc_err, j)
-                    _logp_j = self._logp_exp_err(exp_err, j)
-                    if not self.noBackErr_:
-                        _logp_j += self._logp_bc_err(bc_err, j)
-                    _logp_j += self._logp_params(_params)
-                    return -_logp_j
-
-                x0_j = self._random_params()
-                if not self.noBackErr_:
-                    x0_j.append(self._random_bc_err(j))
-                opt_result = opt.minimize(calc_logp_j, x0_j, method='Powell')
-                logp_opt_j = -opt_result.fun
+                # logp_opt_j = -opt_result.fun
+                logp_opt_j = f
                 logp_total += logp_opt_j
+                # print
 
             else:
                 bc_val = self.compute_back_calc_mean(structs, params, j)
@@ -347,9 +376,12 @@ class EISDOPT(object):
         e = 0
         indi = [0] * len(self.dataEISDs_)
         for i in range(len(self.dataEISDs_)):
+            start = time.time()
             ei = self.dataEISDs_[i].calc_logp(self.stateStructs_)
+            print time.time() - start
             indi[i] = ei
             e += ei
+        print
         return e, indi
 
     @staticmethod
@@ -377,8 +409,8 @@ class EISDOPT(object):
             cool_sched = EISDOPT.default_cool
 
         stats_str = "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%ss" % (
-                "iter", "accept?", "e", "prior", "jcoup_e", "shift_e",
-                "p_a", "iter_time")
+            "iter", "accept?", "e", "prior", "jcoup_e", "shift_e",
+            "p_a", "iter_time")
         if self.verbose_:
             print stats_str
 
@@ -396,11 +428,12 @@ class EISDOPT(object):
         for i in range(self.startIter_, niter):
             start = time.time()  # keep track of step time
             self._perturb()
+
             data1, indi1 = self._calc_data_prob()
             prior1 = self.prior_.calc_prior_logp(self.priorArgs_)
-            if prior1 < 0:
-                self._restore()
-                continue
+            # if prior1 < 0:
+            #     self._restore()
+            #     continue
             e1 = data1 + theta * prior1
 
             dE = e0 - e1

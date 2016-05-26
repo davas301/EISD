@@ -1,4 +1,5 @@
 from scipy.stats import norm
+import numpy as np
 
 """
 Copyright (c) 2016, Teresa Head-Gordon and David Brookes
@@ -67,3 +68,16 @@ def normal_loglike(x, mu, sig):
     :param sig: standard deviation of distribution
     """
     return norm.logpdf(x, loc=mu, scale=sig)
+
+
+def normal_log_deriv(x, mu, sig):
+    """
+    Derivative of the log of the normal distribution with respect to x
+    :param x: value to be tested
+    :param mu: mean
+    :param sig: variance
+    :return: d/dx
+    """
+    return (-2*x + mu) / (2 * sig**2)
+
+
