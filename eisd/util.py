@@ -1,5 +1,7 @@
 from scipy.stats import norm
 import numpy as np
+import time
+import matplotlib.pyplot as plt
 
 """
 Copyright (c) 2016, Teresa Head-Gordon and David Brookes
@@ -78,6 +80,32 @@ def normal_log_deriv(x, mu, sig):
     :param sig: variance
     :return: d/dx
     """
-    return (-2*x + mu) / (2 * sig**2)
+    return (-2 * x + mu) / (2 * sig ** 2)
+
+
+def timeit(f):
+    """
+    Timing decorator for a function f
+    :param f: a function
+    :return: timing
+    """
+
+    def timed(*args, **kw):
+        """
+        A timed function
+        :param args:
+        :param kw:
+        :return:
+        """
+        ts = time.time()
+        result = f(*args, **kw)
+        te = time.time()
+
+        print 'func:%r took: %2.4f sec' % \
+              (f.__name__, te - ts)
+        return result
+
+    return timed
+
 
 

@@ -57,15 +57,6 @@ class Structure(object):
         chain = struct.get_chains().next()
         self.protein_ = Bio.PDB.Polypeptide.Polypeptide(chain)
 
-        # pdbconfig = PDBConfiguration(pdbfile)
-        # pdbconfig.deleteHydrogens()
-        # pepchains = pdbconfig.createPeptideChains()
-        # chain_idx = 0
-        #
-        # self.protein_ = Protein(pepchains[chain_idx])
-        # self.protein_.normalizeConfiguration()
-        # self.sequence_ = self.protein_.chains[0][0].sequence()
-
         if shiftxfile is not None:
             self.shiftxdata_ = RunShiftX.read_ouput(shiftxfile)
         elif runshiftx is not None:
@@ -76,24 +67,13 @@ class Structure(object):
 
         self.energy_ = energy
         self.dihed_ = self._get_all_dihed()
-    #     self.coords_ = self._get_all_atom_coords()
-    #
-    # def _get_all_atom_coords(self):
-    #     """
-    #     Retrieve all of the atomic coordinates in this structure.
-    #     :return: a {(res_num, atom_name): [x,y,z]} dict
-    #     """
-    #     dout = {}
-    #     for atom in self.protein_.atomList():
-    #         atom_name = atom.name
-    #         res_num = atom.parent.parent.sequence_number
-    #         idx = atom.index
-    #         if atom.array is None:
-    #             coords = atom.pos[0]
-    #         else:
-    #             coords = atom.array[idx]
-    #         dout[(res_num, atom_name)] = coords
-    #     return dout
+
+        # self.allJCoupMeasures_ = {exp_id: Measurement(data_id=exp_id,
+        #                           val=self.dihed_[exp_id.res_])
+        #                           for exp_id in self.dihed_.keys()}
+        # self.allShiftMeasures_ = {exp_id: Measurement(data_id=exp_id,
+        #                           val=self.shiftxdata_[exp_id])
+        #                           for exp_id in self.shiftxdata_.keys()}
 
     def _get_all_dihed(self):
         """
@@ -104,10 +84,6 @@ class Structure(object):
         phi_psi = self.protein_.get_phi_psi_list()
         all_dihed = {}
         for i in range(0, len(phi_psi)):
-            # phi_psi = all_res[i].phiPsi()
-            # phi = phi_psi[0]
-            # psi = phi_psi[1]
-            # res_num = all_res[i].sequence_number
             all_dihed[i+1] = phi_psi[i]
         return all_dihed
 
@@ -122,7 +98,9 @@ class Structure(object):
         if isinstance(exp_id, ShiftID):
             struct_meas = Measurement(data_id=exp_id,
                                       val=self.shiftxdata_[exp_id])
+            # struct_meas = self.shiftxdata_[exp_id]
         else:
             struct_meas = Measurement(data_id=exp_id,
                                       val=self.dihed_[exp_id.res_])
+            # struct_meas = self.dihed_[exp_id.res_][0]
         return struct_meas
