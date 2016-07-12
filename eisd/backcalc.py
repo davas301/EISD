@@ -79,7 +79,8 @@ class BaseBackCalculator(object):
         Get a value drawn from the error distribution of this back-calculator
 
         :param data_id: a DataID object
-        :return: a random error taken from the distribution corresponding to the input data id
+        :return: a random error taken from the distribution corresponding to
+                 the input data id
         """
         raise NotImplementedError
 
@@ -132,19 +133,7 @@ class BaseBackCalculator(object):
         """
         raise NotImplementedError
 
-    def calc_opt_params(self, all_x, sig_eps, exp_val):
-        """
-        Given all structural measurements, calculate the optimal
-        paramater set and return the total probability with those
-        parameters (i.e. the optimal function value)
-        :param all_x: list of all structural measurements
-        :param sig_eps: std of experimental error
-        :param exp_val: experimental value
-        :return: list of optimal parameters, optimal function value
-        """
-        raise NotImplementedError
-
-    def calc_opt_params_fast(self, n, precalc_params, sig_eps, exp_val):
+    def calc_opt_params(self, n, precalc_params, sig_eps, exp_val):
         """
         Given all structural measurements, calculate the optimal
         paramater set and return the total probability with those
@@ -285,59 +274,7 @@ class JCoupBackCalc(BaseBackCalculator):
                            val=np.array([np.pi, np.pi]))
         return meas
 
-    def calc_opt_params(self, all_x, sig_eps, exp_val):
-        """
-        Analytically calculate the optimal A, B and C in the Karplus equation.
-        For more info see BaseBackCalculator
-        :param all_x:
-        :param sig_eps:
-        :param exp_val:
-        :return: optimal A, B, C in a list
-        """
-        n = len(all_x)
-        alpha1 = 0
-        alpha2 = 0
-        for x in all_x:
-            phi = x.val_[0]
-            alpha2 += np.cos(phi - (np.pi / 3)) ** 2
-            alpha1 += np.cos(phi - (np.pi / 3))
-
-        a = np.zeros((3, 3))
-        b = np.zeros((3,))
-
-        b[0] = ((self.muParams_[0] / self.sigParams_[0] ** 2) + (
-            (exp_val * alpha2) / (n * sig_eps ** 2)))
-
-        b[1] = ((self.muParams_[1] / self.sigParams_[1] ** 2) + (
-            (exp_val * alpha1) / (n * sig_eps ** 2)))
-
-        b[2] = ((self.muParams_[2] / self.sigParams_[2] ** 2) + (
-            exp_val / (sig_eps ** 2)))
-
-        a[0, 0] = (
-            (1 / self.sigParams_[0] ** 2) + (
-                alpha2 ** 2 / (sig_eps ** 2 * n ** 2)))
-        a[1, 1] = (
-            (1 / self.sigParams_[1] ** 2) + (
-                alpha1 ** 2 / (sig_eps ** 2 * n ** 2)))
-        a[2, 2] = ((1 / self.sigParams_[2] ** 2) + (1 / (sig_eps ** 2)))
-
-        a[0, 1] = (1 / (sig_eps ** 2 * n ** 2)) * alpha2 * alpha1
-        a[1, 0] = (1 / (sig_eps ** 2 * n ** 2)) * alpha2 * alpha1
-        a[0, 2] = (alpha2 / (n * sig_eps ** 2))
-        a[1, 2] = (alpha1 / (n * sig_eps ** 2))
-        a[2, 0] = (alpha2 / (n * sig_eps ** 2))
-        a[2, 1] = (alpha1 / (n * sig_eps ** 2))
-
-        opt_params = linalg.solve(a, b)
-
-        f = self.logp_params(opt_params)
-        exp_err = exp_val - (opt_params[0] * alpha2 / n) - (
-            opt_params[1] * alpha1 / n) - opt_params[2]
-        f += normal_loglike(exp_err, mu=0, sig=sig_eps)
-        return opt_params, f
-
-    def calc_opt_params_fast(self, n, alphas, sig_eps, exp_val):
+    def calc_opt_params(self, n, alphas, sig_eps, exp_val):
         """
         Analytically calculate the optimal A, B and C in the Karplus equation.
         For more info see BaseBackCalculator
@@ -490,29 +427,11 @@ class ShiftBackCalc(BaseBackCalculator):
         """
         return Measurement(data_id=None, val=None)
 
-    def calc_opt_params(self, all_x, sig_eps, exp_val):
+    def calc_opt_params(self, n, beta_sig, sig_eps, exp_val):
         """
         Analytically calculate the optimal back-calculation error.
         For more info see BaseBackCalculator
-        :param all_x:
-        :param sig_eps:
-        :param exp_val:
-        :return: optimal back calculator error in a list
-        """
-        sig_bc = SHIFTX2_RMSD[all_x[0].dataID_.atom_]
-        beta = np.mean([self.back_calc(xi) for xi in all_x])
-        alpha = (sig_bc ** 2 / sig_eps ** 2)
-        eps_back_opt = (alpha * (beta - exp_val)) / (1 + alpha)
 
-        f = self.logp_err(eps_back_opt, all_x[0].dataID_)
-        exp_err = beta - exp_val - eps_back_opt
-        f += normal_loglike(exp_err, mu=0, sig=sig_eps)
-        return [eps_back_opt], f
-
-    def calc_opt_params_fast(self, n, beta_sig, sig_eps, exp_val):
-        """
-        Analytically calculate the optimal back-calculation error.
-        For more info see BaseBackCalculator
         :param n: number of structures
         :param beta_sig: [sum of shift back calculations, std for this atom]
         :param sig_eps:
@@ -521,13 +440,9 @@ class ShiftBackCalc(BaseBackCalculator):
         """
         beta = beta_sig[0] / n
         sig_bc = beta_sig[1]
-        # sig_bc = SHIFTX2_RMSD[all_x[0].dataID_.atom_]
-
-        # beta = np.mean([self.back_calc(xi) for xi in all_x])
         alpha = (sig_bc ** 2 / sig_eps ** 2)
         eps_back_opt = (alpha * (beta - exp_val)) / (1 + alpha)
 
-        # f = self.logp_err(eps_back_opt, all_x[0].dataID_)
         f = normal_loglike(eps_back_opt, mu=0, sig=sig_bc)
         exp_err = beta - exp_val - eps_back_opt
         f += normal_loglike(exp_err, mu=0, sig=sig_eps)

@@ -1,7 +1,6 @@
 from scipy.stats import norm
 import numpy as np
 import time
-import matplotlib.pyplot as plt
 
 """
 Copyright (c) 2016, Teresa Head-Gordon and David Brookes
@@ -108,4 +107,65 @@ def timeit(f):
     return timed
 
 
+class BaseCoolSched(object):
+    """
+    Base class for cooling schedules. All cooling schedules require and
+    starting temperature and scale
+    :param temp0: starting temperature
+    :param scale: rate of change
+    """
 
+    def __init__(self, temp0, scale):
+        self.T0_ = temp0
+        self.scale_ = scale
+
+    def calc_temp(self, t):
+        """
+        Calculate the temperature given a time
+        :param t: time as fraction of total iterations
+        :return: temperature
+        """
+        raise NotImplementedError
+
+
+class GaussianCoolSched(BaseCoolSched):
+    """
+    Gaussian cooling schedule: T = T0 * exp(-(scale*t)**2)
+    For more info, see BaseCoolSched
+    :param temp0: starting temperature
+    :param scale: rate of change
+    """
+
+    def __init__(self, temp0, scale):
+        super(GaussianCoolSched, self).__init__(temp0, scale)
+
+    def calc_temp(self, t):
+        """
+        Calculates gaussian cooled temperature
+        :param t:
+        :return:
+        """
+        return self.T0_ * np.exp(-(self.scale_ * t) ** 2)
+
+
+class LinearCoolSched(BaseCoolSched):
+    """
+    Linear schedule: T = T0 - scale*t
+    For more info, see BaseCoolSched
+    :param temp0: starting temperature
+    :param scale: rate of change
+    """
+
+    def __init__(self, temp0, scale):
+        super(LinearCoolSched, self).__init__(temp0, scale)
+
+    def calc_temp(self, t):
+        """
+        Calculates linear cooled temperature
+        :param t:
+        :return:
+        """
+        temp = self.T0_ - self.scale_ * t
+        if temp < 0:
+            temp = 0
+        return temp

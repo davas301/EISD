@@ -44,8 +44,10 @@ class Structure(object):
     Class for representing and modifying protein structures. Interfaces
     significantly with MMTK.
 
-    :param pdbfile: path to the pdbfile containing the representation of this structure
-    :param shiftxfile: file containing back-calculated SHIFTX2 data for this structure
+    :param pdbfile: path to the pdbfile containing the representation of this
+                    structure
+    :param shiftxfile: file containing back-calculated SHIFTX2 data for this
+                       structure
     :param runshiftx: an optional RunShiftX instance
     """
 
@@ -67,13 +69,6 @@ class Structure(object):
 
         self.energy_ = energy
         self.dihed_ = self._get_all_dihed()
-
-        # self.allJCoupMeasures_ = {exp_id: Measurement(data_id=exp_id,
-        #                           val=self.dihed_[exp_id.res_])
-        #                           for exp_id in self.dihed_.keys()}
-        # self.allShiftMeasures_ = {exp_id: Measurement(data_id=exp_id,
-        #                           val=self.shiftxdata_[exp_id])
-        #                           for exp_id in self.shiftxdata_.keys()}
 
     def _get_all_dihed(self):
         """
@@ -98,9 +93,7 @@ class Structure(object):
         if isinstance(exp_id, ShiftID):
             struct_meas = Measurement(data_id=exp_id,
                                       val=self.shiftxdata_[exp_id])
-            # struct_meas = self.shiftxdata_[exp_id]
         else:
             struct_meas = Measurement(data_id=exp_id,
                                       val=self.dihed_[exp_id.res_])
-            # struct_meas = self.dihed_[exp_id.res_][0]
         return struct_meas

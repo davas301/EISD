@@ -112,7 +112,7 @@ class QuasiHarmonicPrior(BasePrior):
         ref_array = (ref_array - np.mean(ref_array, axis=0)) / np.std(ref_array,
                                                                       axis=0)
         self.refMu_ = np.mean(ref_array, axis=0)
-        self.refCov_ = np.cov(ref_array, rowvar=0)
+        self.refCov_ = np.cov(ref_array, rowvar=False)
         super(QuasiHarmonicPrior, self).__init__()
 
     @staticmethod
@@ -153,7 +153,7 @@ class QuasiHarmonicPrior(BasePrior):
             test_array, axis=0)
         test_array = np.array(test_array)
         test_mu = np.mean(test_array, axis=0)
-        test_cov = np.cov(test_array, rowvar=0)
+        test_cov = np.cov(test_array, rowvar=False)
 
         kl = QuasiHarmonicPrior.normal_kl(test_mu, test_cov,
                                           self.refMu_, self.refCov_)

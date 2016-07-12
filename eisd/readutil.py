@@ -3,6 +3,7 @@ import os
 import subprocess
 import time
 import numpy as np
+import sys
 
 """
 Copyright (c) 2016, Teresa Head-Gordon and David Brookes
@@ -173,23 +174,34 @@ class RunShiftX(object):
             subprocess.call(["rm", "-rf", fn])
 
     @staticmethod
-    def read_ouput(f):
+    def read_ouput(path):
         """
-        Reads a shiftx2 output file
+        Reads a SHIFTX2 output file
 
-        :param f: output file to be read
+        :param path: output file to be read
         :return: {ShiftID: shift_val} dict
         """
-        lines = open(f).readlines()
+        try:
+            f = open(path)
+        except IOError:
+            print "Could not find SHIFTX output file. It should have the same" \
+                  "path as the pdb file, with '.cs' appended to the end." \
+                  "Please name files correctly or use the 'RUN_SHIFTX' option" \
+                  "in your input file."
+            print "Aborting program"
+            sys.exit()
         dout = {}
-        for i in range(1, len(lines)):
-            split = lines[i].split(',')
+        i = 0
+        for line in f:
+            if i < 1:
+                continue
+            split = line.split(',')
             res_num = int(split[0])
-            # res_name = split[1]
             atom_name = split[2]
             shift_value = float(split[3])
             sid = ShiftID(res_num=res_num, atom_name=atom_name)
             dout[sid] = shift_value
+            i += 1
         return dout
 
 
@@ -297,10 +309,79 @@ def get_ab42_shift_data():
     return shift_data
 
 
+def read_jcoup_data(path):
+    """
+    Read a file of experimental j-coupling data. Must be in ENSEMBLE format:
+
+    res1 atom1 res2 atom2 res3 atom3 res4 atom4 J err_low err_up
+
+    Where the last lines are standard deviations.
+    Currently the only usable type is 3JHNHA coupling data.
+    :param path: path to data file
+    :return: a {JCoupID: val} dict
+    """
+    jcoup_data = {}
+    expj = open(path)
+    for line in expj:
+        split = line.split()
+        if len(split) < 11 or line.startswith('#'):
+            continue
+        else:
+            try:
+                res_num = int(split[0])
+                val = float(split[8])
+                err = (float(split[9]) + float(split[10])) / 2
+            except ValueError:
+                print "J-coupling data not formatted properly. Please format " \
+                      "as:\n res1 atom1 res2 atom2 res3 atom3 " \
+                      "res4 atom4 J err_low err_up\n "
+                print "Aborting program."
+                sys.exit()
+
+            jid = JCoupID(res_num)
+            jcoup_data[jid] = (val, err)
+    expj.close()
+    return expj
+
+
+def read_chemshift_data(path):
+    """
+    Read a file of experimental chemical shift data. Must be in ENSEMBLE format:
+
+    residue atom shift error
+
+    :param path: path to data file.
+    :return: a {ShiftID: val} dict
+    """
+    shift_data = {}
+    expcs = open(path)
+    for line in expcs:
+        split = line.split()
+        if len(split) < 4 or line.startswith('#'):
+            continue
+        else:
+            try:
+                res_num = int(split[0])
+                atom = str(split[1])
+                val = float(split[2])
+                err = float(split[3])
+                # err = (float(split[9]) + float(split[10])) / 2
+            except ValueError:
+                print "Chemical shift data not formatted properly. Please " \
+                      "format as:\n residue atom shift error"
+                print "Aborting program."
+                sys.exit()
+
+            sid = ShiftID(res_num, atom)
+            shift_data[sid] = (val, err)
+    expcs.close()
+    return expcs
+
+
 def get_md_energies():
     """
     Read the energy file containing all the energies for the
-    MD ensemble in in ../test_data/
+    MD ensemble in ../test_data/
 
     :return: {filename: energy} dict
     """
@@ -328,7 +409,7 @@ def read_opt_out_file(path):
     lines = f.readlines()
     f.close()
     files = []
-    iter = int(lines[0].split()[-1])
+    itr = int(lines[0].split()[-1])
     for line in lines[1:]:
         files.append(line.split()[0].strip('\n').strip(".cs"))
-    return files, iter
+    return files, itr
