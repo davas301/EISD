@@ -1,9 +1,10 @@
 import glob
 import os
 import subprocess
-import time
-import numpy as np
 import sys
+import time
+
+import numpy as np
 
 """
 Copyright (c) 2016, Teresa Head-Gordon and David Brookes
@@ -192,8 +193,10 @@ class RunShiftX(object):
             sys.exit()
         dout = {}
         i = 0
+
         for line in f:
             if i < 1:
+                i += 1
                 continue
             split = line.split(',')
             res_num = int(split[0])

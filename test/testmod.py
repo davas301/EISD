@@ -2,11 +2,11 @@ import os
 
 import numpy as np
 
-import eisd.readutil
-from eisd.backcalc import JCoupBackCalc, ShiftBackCalc
-from eisd.eisd import DataEISD, EISDOPT
-from eisd.priors import UniformPrior
-from eisd.structure import Structure
+import eisdcore.readutil
+from eisdcore.backcalc import JCoupBackCalc, ShiftBackCalc
+from eisdcore.eisdcore import DataEISD, EISDOPT
+from eisdcore.priors import UniformPrior
+from eisdcore.structure import Structure
 
 """
 Copyright (c) 2016, Teresa Head-Gordon and David Brookes
@@ -60,7 +60,7 @@ def test_ensemble(pdbdir):
     structs = [Structure(f) for f in all_paths]
 
     # get data: (example is j-coupling data for AB42)
-    exp_data = eisd.readutil.get_ab42_jcoup_data()
+    exp_data = eisdcore.readutil.get_ab42_jcoup_data()
 
     # build back-calculator and  data eisd calculator:
     back_calc = JCoupBackCalc()
@@ -94,9 +94,9 @@ def optimize_ensemble():
     prior = UniformPrior(1)
 
     # build DataEISD objects
-    jcoup_eisd = DataEISD(JCoupBackCalc(), eisd.readutil.get_ab42_jcoup_data(),
+    jcoup_eisd = DataEISD(JCoupBackCalc(), eisdcore.readutil.get_ab42_jcoup_data(),
                           no_bc_err=True, no_opt=True)
-    shift_eisd = DataEISD(ShiftBackCalc(), eisd.readutil.get_ab42_shift_data(),
+    shift_eisd = DataEISD(ShiftBackCalc(), eisdcore.readutil.get_ab42_shift_data(),
                           no_opt=True)
     data_eisds = [jcoup_eisd, shift_eisd]
 

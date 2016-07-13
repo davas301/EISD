@@ -1,8 +1,7 @@
-
 import Bio.PDB
+
 from readutil import RunShiftX, Measurement
 from readutil import ShiftID
-
 
 """
 Copyright (c) 2016, Teresa Head-Gordon and David Brookes
@@ -79,7 +78,7 @@ class Structure(object):
         phi_psi = self.protein_.get_phi_psi_list()
         all_dihed = {}
         for i in range(0, len(phi_psi)):
-            all_dihed[i+1] = phi_psi[i]
+            all_dihed[i + 1] = phi_psi[i]
         return all_dihed
 
     def get_struct_measure(self, exp_id):

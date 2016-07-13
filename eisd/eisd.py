@@ -1,5 +1,6 @@
-from setupeisd import InputFile, SetupOpt
 import sys
+
+from setupeisd import InputFile, SetupOpt
 
 """
 Copyright (c) 2016, Teresa Head-Gordon and David Brookes
@@ -30,7 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 __author__ = 'David Brookes'
 __date__ = '7/11/16'
-
 
 """
 This is the 'main' module from which the program is run

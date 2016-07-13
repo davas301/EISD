@@ -1,9 +1,10 @@
-import sys
 import os
-from priors import UniformPrior
-from readutil import read_chemshift_data, read_jcoup_data
+import sys
+
 from backcalc import JCoupBackCalc, ShiftBackCalc
 from eisdcore import DataEISD, EISDOPT
+from priors import UniformPrior
+from readutil import read_chemshift_data, read_jcoup_data
 
 """
 Copyright (c) 2016, Teresa Head-Gordon and David Brookes
@@ -55,9 +56,9 @@ class InputFile(object):
             'SUB_SIZE': None,  # size of final subset
 
             # Data parameters:
-            'JCOUP_ON': 0,  # use JCoupling data?
+            'USE_JCOUP': 0,  # use JCoupling data?
             'JCOUP_PATH': None,  # path to Jcoupling data
-            'SHIFT_ON': 0,  # use chemical shift data?
+            'USE_SHIFT': 0,  # use chemical shift data?
             'SHIFT_PATH': None,  # path to chemical shift data
             'RUN_SHIFTX': 0,  # run shiftx on every structure?
             'SHIFTX_EXE': None,  # path to shiftx executable
@@ -90,6 +91,8 @@ class InputFile(object):
         """
         split = line.split()
         if split[0] in self.keys_.keys():
+            if len(split) == 1:
+                return
             self.keys_[split[0]] = split[1]
         else:
             print "%s is not a valid keyword. Continuing anyway..." % split[0]
@@ -122,7 +125,7 @@ class InputFile(object):
             return False
 
         # now make sure things are the correct type:
-        for bool_key in ['JCOUP_ON', 'SHIFT_ON', 'RUN_SHIFTX']:
+        for bool_key in ['USE_JCOUP', 'USE_SHIFT', 'RUN_SHIFTX']:
             try:
                 self.keys_[bool_key] = bool(self.keys_[bool_key])
             except ValueError:
@@ -139,13 +142,13 @@ class InputFile(object):
                 return False
 
         # Now make sure paths exist:
-        if self.keys_['JCOUP_ON']:
+        if self.keys_['USE_JCOUP']:
             if not os.path.exists(self.keys_['JCOUP_PATH']):
                 print "%s is not a valid path to a j coupling file" % \
                       self.keys_['JCOUP_PATH']
                 return False
 
-        if self.keys_['SHIFT_ON']:
+        if self.keys_['USE_SHIFT']:
             if not os.path.exists(self.keys_['SHIFT_PATH']):
                 print "%s is not a valid path to a chemical shift file" % \
                       self.keys_['SHIFT_PATH']
@@ -206,7 +209,7 @@ class SetupOpt(object):
         self.inpFile_ = inp_file
         # self.pdbdir_ = inp_file.keys['PDBDIR']
         # self.subsize_ = inp_file.keys['SUBSIZE']
-        
+
         self.prior_ = self._setup_prior()
         self.dataEISD_ = self._setup_eisd_obj()
         self.opt_ = self._setup_opt()
@@ -228,11 +231,11 @@ class SetupOpt(object):
         """
         back_calcs = []
         data_dicts = []
-        if self.inpFile_.keys_['JCOUP_ON']:
+        if self.inpFile_.keys_['USE_JCOUP']:
             back_calcs.append(JCoupBackCalc())
             data_file = read_jcoup_data(self.inpFile_.keys_['JCOUP_PATH'])
             data_dicts.append(data_file)
-        if self.inpFile_.keys_['SHIFT_ON']:
+        if self.inpFile_.keys_['USE_SHIFT']:
             back_calcs.append(ShiftBackCalc())
             data_file = read_chemshift_data(self.inpFile_.keys_['SHIFT_PATH'])
             data_dicts.append(data_file)

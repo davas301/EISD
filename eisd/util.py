@@ -1,6 +1,6 @@
-from scipy.stats import norm
-import numpy as np
 import time
+import numpy as np
+from scipy.stats import norm
 
 """
 Copyright (c) 2016, Teresa Head-Gordon and David Brookes
@@ -169,3 +169,56 @@ class LinearCoolSched(BaseCoolSched):
         if temp < 0:
             temp = 0
         return temp
+
+
+def calc_psrf(seqs, rand_toss=False):
+    """
+    Calculate the Potential Scale Reduction Factor (PSRF) for convergence
+    of an iterative process. The PSRF approaches one as the process becomes
+    more converged. For more info, see :
+    Gelman, Andrew, and Donald B. Rubin. "Inference from iterative simulation
+    using multiple sequences." Statistical science (1992): 457-472.
+
+    :param seqs: list of m simulation sequences of length 2n
+    :param rand_toss: throw away half of the iterations from each sequence
+                          randomly (otherwise throw away the first half)
+    :return: PSRF value
+    """
+    n = int(len(seqs[0]) / 2)
+    m = len(seqs)
+    for i in range(m):
+        if not rand_toss:
+            seqs[i] = seqs[i][n:]
+        else:
+            seqs[i] = np.random.choice(seqs, n)
+
+    s = np.var(seqs, axis=1)  # variance of each sequence
+    x = np.mean(seqs, axis=1)  # mean of each sequence
+    mu = np.mean(x)  # total mean
+    w = np.mean(s)  # average intra-sequence variance
+    b = 0  # inter sequence variance
+
+    cov_si_xi2 = 0
+    cov_si_xi = 0
+    for i in range(m):
+        b += (x[i] - mu) ** 2 / (m - 1)
+        cov_si_xi += (s[i] - w) * (x[i] - mu)
+        cov_si_xi2 += (s[i] - w) * (x[i] ** 2 - mu ** 2)
+
+    cov_si_xi /= (m - 1)
+    cov_si_xi2 /= (m - 1)
+
+    b *= n
+    sig2 = ((float(n - 1) / n) * w) + (b / n)
+
+    v = sig2 + (b / (m * n))
+    var_s2 = np.var(s)
+
+    var_v = ((float(n - 1) / n) ** 2) * (1. / m) * var_s2
+    var_v += ((float(m + 1) / (m * n)) ** 2) * (2 / float(m - 1)) * b ** 2
+    var_v += (2 * (float(m + 1) * float(n - 1)) / (m * n ** 2)) * (
+        float(n) / m) * (cov_si_xi2 - 2 * mu * cov_si_xi)
+
+    df = (2 * v ** 2) / var_v
+    r = ((v / w) * df) / (df - 2)
+    return r

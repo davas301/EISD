@@ -1,11 +1,10 @@
 import os
 import time
 import numpy as np
-import scipy.optimize as opt
-from eisdstructure import Structure
-from util import normal_loglike, timeit, SHIFTX2_RMSD, GaussianCoolSched
-from readutil import read_opt_out_file
 from backcalc import JCoupBackCalc
+from eisdstructure import Structure
+from readutil import read_opt_out_file
+from util import SHIFTX2_RMSD, GaussianCoolSched
 
 """
 Copyright (c) 2016, Teresa Head-Gordon and David Brookes
@@ -144,7 +143,8 @@ class DataEISD(object):
             for j in range(self.M_[i]):
                 inlist = [self.N_, self.optParams_[i][j], self.expSigs_[i][j],
                           self.D_[i][j]]
-                opt_params, f = self.backCalcs_[i].calc_opt_params_fast(*inlist)
+
+                opt_params, f = self.backCalcs_[i].calc_opt_params(*inlist)
 
                 logp_opt_j = f
                 logp_totals[i] += logp_opt_j
@@ -186,6 +186,8 @@ class EISDOPT(object):
         self.prior_ = prior
         self.dataEISD_ = data_eisd
 
+        self.runShiftx_ = run_shiftx
+
         build_tup = self._build_start_set(restartfile=restartfile)
         self.stateFiles_, self.stateStructs_, self.startIter_ = build_tup
         self.priorArgs_ = [self.prior_.get_arg(s) for s in self.stateStructs_]
@@ -194,8 +196,6 @@ class EISDOPT(object):
         self.lastRemoveFile_ = None
         self.lastRemoveStruct_ = None
         self.lastRemovePrior_ = None
-
-        self.runShiftx_ = run_shiftx
 
     def _build_start_set(self, restartfile=None):
         """
@@ -359,4 +359,4 @@ class EISDOPT(object):
                     statsf.write(stats_str + "\n")
 
             times.append(time.time() - sum(times))
-            print times[1:], sum(times[1:])
+            # print times[1:], sum(times[1:])
