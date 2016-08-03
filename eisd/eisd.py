@@ -42,7 +42,8 @@ if len(sys.argv) < 2:
     sys.exit()
 
 inpath = sys.argv[1]
-
+print "\n"
+print "Welcome to EISD!\n"
 print "Reading input file..."
 try:
     inf = InputFile(inpath)

@@ -1,10 +1,10 @@
 import os
 import sys
-
 from backcalc import JCoupBackCalc, ShiftBackCalc
 from eisdcore import DataEISD, EISDOPT
 from priors import UniformPrior
 from readutil import read_chemshift_data, read_jcoup_data
+from util import GaussianCoolSched, LinearCoolSched
 
 """
 Copyright (c) 2016, Teresa Head-Gordon and David Brookes
@@ -90,6 +90,8 @@ class InputFile(object):
         :param line: the line to search for a keyword
         """
         split = line.split()
+        if len(split) == 0:
+            return
         if split[0] in self.keys_.keys():
             if len(split) == 1:
                 return
@@ -105,6 +107,8 @@ class InputFile(object):
         lines = f.readlines()
         f.close()
         for line in lines:
+            if line.startswith("#"):
+                continue
             self._find_keyword(line)
 
     def _check_params(self):
@@ -133,7 +137,7 @@ class InputFile(object):
                     self.keys_[bool_key]), bool_key)
                 return False
 
-        for int_key in ['SUBSIZE', 'NITER', 'PRIOR_UNI_M']:
+        for int_key in ['SUB_SIZE', 'N_ITER', 'PRIOR_UNI_M']:
             try:
                 self.keys_[int_key] = int(self.keys_[int_key])
             except ValueError:
@@ -170,21 +174,24 @@ class InputFile(object):
                   "'gaussian, or 'linear'"
             return False
         else:
+
             for cs in cool_scheds:
                 if self.keys_['COOL_SCHED'] == cs:
                     if self.keys_['COOL_T0'] is None:
                         self.keys_['COOL_T0'] = default_cool_params[cs][0]
                     else:
                         try:
-                            self.keys_['COOL_T0'] = float(self.keys_['COOL_TO'])
+                            self.keys_['COOL_T0'] = float(self.keys_['COOL_T0'])
                         except ValueError:
                             print "%s is not a valid starting temperature. " \
                                   "Please input a float."
                             return False
                     if self.keys_['COOL_SCALE'] is None:
                         self.keys_['COOL_SCALE'] = default_cool_params[cs][1]
+                    else:
                         try:
-                            self.keys_['COOL_T0'] = float(self.keys_['COOL_TO'])
+                            self.keys_['COOL_SCALE'] = float(
+                                self.keys_['COOL_SCALE'])
                         except ValueError:
                             print "%s is not a valid cooling scale. " \
                                   "Please input a float."
@@ -253,9 +260,18 @@ class SetupOpt(object):
         savefile = self.inpFile_.keys_['SAVE_FILE']
         statsfile = self.inpFile_.keys_['STATS_FILE']
 
+        if self.inpFile_.keys_['COOL_SCHED'] == 'gaussian':
+            cool_sched = GaussianCoolSched(self.inpFile_.keys_['COOL_T0'],
+                                           self.inpFile_.keys_['COOL_SCALE'])
+        elif self.inpFile_.keys_['COOL_SCHED'] == 'linear':
+            cool_sched = LinearCoolSched(self.inpFile_.keys_['COOL_T0'],
+                                         self.inpFile_.keys_['COOL_SCALE'])
+        else:
+            cool_sched = None
+
         optimizer = EISDOPT(pdbdir, self.prior_, self.dataEISD_, savefile,
                             subsize=subsize, verbose=True, stats_file=statsfile,
-                            run_shiftx=runshiftx)
+                            run_shiftx=runshiftx, cool_sched=cool_sched)
         return optimizer
 
     def run(self):

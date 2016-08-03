@@ -344,7 +344,7 @@ def read_jcoup_data(path):
             jid = JCoupID(res_num)
             jcoup_data[jid] = (val, err)
     expj.close()
-    return expj
+    return jcoup_data
 
 
 def read_chemshift_data(path):
@@ -378,7 +378,7 @@ def read_chemshift_data(path):
             sid = ShiftID(res_num, atom)
             shift_data[sid] = (val, err)
     expcs.close()
-    return expcs
+    return shift_data
 
 
 def get_md_energies():

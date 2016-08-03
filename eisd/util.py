@@ -171,7 +171,7 @@ class LinearCoolSched(BaseCoolSched):
         return temp
 
 
-def calc_psrf(seqs, rand_toss=False):
+def calc_psrf(inseqs, rand_toss=False):
     """
     Calculate the Potential Scale Reduction Factor (PSRF) for convergence
     of an iterative process. The PSRF approaches one as the process becomes
@@ -179,18 +179,20 @@ def calc_psrf(seqs, rand_toss=False):
     Gelman, Andrew, and Donald B. Rubin. "Inference from iterative simulation
     using multiple sequences." Statistical science (1992): 457-472.
 
-    :param seqs: list of m simulation sequences of length 2n
+    :param inseqs: list of m simulation sequences of length 2n
     :param rand_toss: throw away half of the iterations from each sequence
                           randomly (otherwise throw away the first half)
     :return: PSRF value
     """
-    n = int(len(seqs[0]) / 2)
-    m = len(seqs)
+    n = int(len(inseqs[0]) / 2)
+    m = len(inseqs)
+    seqs = []
     for i in range(m):
+        seqs.append([])
         if not rand_toss:
-            seqs[i] = seqs[i][n:]
+            seqs[i] = inseqs[i][n:]
         else:
-            seqs[i] = np.random.choice(seqs, n)
+            seqs[i] = np.random.choice(inseqs, n)
 
     s = np.var(seqs, axis=1)  # variance of each sequence
     x = np.mean(seqs, axis=1)  # mean of each sequence
@@ -202,23 +204,26 @@ def calc_psrf(seqs, rand_toss=False):
     cov_si_xi = 0
     for i in range(m):
         b += (x[i] - mu) ** 2 / (m - 1)
-        cov_si_xi += (s[i] - w) * (x[i] - mu)
-        cov_si_xi2 += (s[i] - w) * (x[i] ** 2 - mu ** 2)
-
-    cov_si_xi /= (m - 1)
-    cov_si_xi2 /= (m - 1)
+        cov_si_xi += (s[i] - w) * (x[i] - mu) / m
+        cov_si_xi2 += (s[i] - w) * (x[i] ** 2 - mu ** 2) / m
 
     b *= n
     sig2 = ((float(n - 1) / n) * w) + (b / n)
 
     v = sig2 + (b / (m * n))
-    var_s2 = np.var(s)
+    return v
+    # r = (float(m+1)/m) * (sig2/w) - (float(n-1)/(m*n))
+    # return r
 
-    var_v = ((float(n - 1) / n) ** 2) * (1. / m) * var_s2
-    var_v += ((float(m + 1) / (m * n)) ** 2) * (2 / float(m - 1)) * b ** 2
-    var_v += (2 * (float(m + 1) * float(n - 1)) / (m * n ** 2)) * (
-        float(n) / m) * (cov_si_xi2 - 2 * mu * cov_si_xi)
-
-    df = (2 * v ** 2) / var_v
-    r = ((v / w) * df) / (df - 2)
-    return r
+    # return v
+    # var_s2 = np.var(s)
+    #
+    # var_v = ((float(n - 1) / n) ** 2) * (1. / m) * var_s2
+    # var_v += ((float(m + 1) / (m * n)) ** 2) * (2 / float(m - 1)) * b ** 2
+    # var_v += (2 * (float(m + 1) * float(n - 1)) / (m * n ** 2)) * (
+    #     float(n) / m) * (cov_si_xi2 - 2 * mu * cov_si_xi)
+    # # return var_v
+    # df = (2 * v ** 2) / var_v
+    # # return v/w
+    # r = ((v / w) * df) / (df - 2)
+    # return r
