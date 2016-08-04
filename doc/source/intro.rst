@@ -53,6 +53,13 @@ Now navigate to the downloaded directory and run the setup tool::
 $ cd eisd/
 $ python setup.py
 
+EISD can now be run with the command:
+
+$ eisdrun.py <input_file>
+
+where :code:`<input_file>` is an EISD input file (described in detail in the
+"Use" section)
+
 The EISD modules can now be imported into any local python program.
 
 Users may also want to install **SHIFTX2** for chemical shift prediction, whose download and installation
