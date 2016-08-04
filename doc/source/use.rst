@@ -1,7 +1,21 @@
 .. EISD use documentation file
 
+
+
 Use
 ===
+
+Overview
+--------
+
+EISD 
+
+.. _input-file:
+
+Input File
+----------
+
+
 
 Calculating EISD probabilities
 ------------------------------
