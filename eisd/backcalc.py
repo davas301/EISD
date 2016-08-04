@@ -1,8 +1,8 @@
 import numpy as np
-from readutil import Measurement
-from util import SHIFTX2_RMSD, normal_loglike, timeit
 from scipy import linalg
-import time
+
+from readutil import Measurement
+from util import SHIFTX2_RMSD, normal_loglike
 
 """
 Copyright (c) 2016, Teresa Head-Gordon and David Brookes

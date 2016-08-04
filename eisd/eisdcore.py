@@ -1,6 +1,8 @@
 import os
 import time
+
 import numpy as np
+
 from backcalc import JCoupBackCalc
 from eisdstructure import Structure
 from readutil import read_opt_out_file

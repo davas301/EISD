@@ -39,7 +39,7 @@ easily done with the :code:`pip` tool, which can be installed by following the
 instructions `here`_. Then type on the command line::
 
 $ pip install numpy
-$ pip install sklearn
+$ pip install scipy
 $ pip install biopython
 
 .. _here: https://pip.pypa.io/en/stable/installing/

@@ -3,9 +3,9 @@
 Modules
 =======
 
-eisd
-----
-.. automodule:: eisd
+eisdcore
+--------
+.. automodule:: eisdcore
    :members:
    :private-members:
 
@@ -20,9 +20,9 @@ priors
 .. automodule:: priors
    :members:
 
-structure
----------
-.. automodule:: structure
+eisdstructure
+-------------
+.. automodule:: eisdstructure
    :members:
    :private-members:
 
@@ -38,4 +38,8 @@ util
    :members:
    :private-members:
 
-
+setupeisd
+---------
+.. automodule:: setupeisd
+   :members:
+   :private-members:

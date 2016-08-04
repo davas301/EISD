@@ -6,7 +6,7 @@
 Welcome!
 ========
 
-This is documentation for EISD, an IDP ensemble scoring and optimization program
+This is documentation for EISD, an IDP ensemble optimization program
 developed in the THG lab at UC Berkeley.
 
 
