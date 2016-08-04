@@ -1,0 +1,1423 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Modules &mdash; EISD 0.1 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="EISD 0.1 documentation" href="index.html"/>
+        <link rel="next" title="References" href="references.html"/>
+        <link rel="prev" title="Use" href="use.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+          <a href="index.html" class="fa fa-home"> EISD</a>
+        
+        
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+          
+          
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#dependencies">Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#installation">Installation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="use.html">Use</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="use.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="use.html#calculating-eisd-probabilities">Calculating EISD probabilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="use.html#finding-optimal-subsets">Finding optimal subsets</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-eisdcore">eisdcore</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-backcalc">backcalc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-priors">priors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-eisdstructure">eisdstructure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-readutil">readutil</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-util">util</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-setupeisd">setupeisd</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+          
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">EISD</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Modules</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="sources/modules.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document">
+            
+  <div class="section" id="modules">
+<h1>Modules<a class="headerlink" href="#modules" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-eisdcore">
+<span id="eisdcore"></span><h2>eisdcore<a class="headerlink" href="#module-eisdcore" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="eisdcore.DataEISD">
+<em class="property">class </em><code class="descclassname">eisdcore.</code><code class="descname">DataEISD</code><span class="sig-paren">(</span><em>back_calcs</em>, <em>exp_datas</em><span class="sig-paren">)</span><a class="headerlink" href="#eisdcore.DataEISD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implementation of the Experimental Inferential Structure Determination
+model optimized for speed (uses analytic solutions)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>back_calcs</strong> &#8211; list of BaseBackCalculator object</li>
+<li><strong>exp_datas</strong> &#8211; list of experimental data corresponding to back-calcs)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="eisdcore.DataEISD.calc_logp">
+<code class="descname">calc_logp</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#eisdcore.DataEISD.calc_logp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the full EISD log probability
+:return: log probability</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="eisdcore.DataEISD.set_struct_vals">
+<code class="descname">set_struct_vals</code><span class="sig-paren">(</span><em>structs</em><span class="sig-paren">)</span><a class="headerlink" href="#eisdcore.DataEISD.set_struct_vals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the values requiring structural values (<a href="#id1"><span class="problematic" id="id2">optParams_</span></a>)
+:param structs: list of Structure objects</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="eisdcore.DataEISD.update_struct_vals">
+<code class="descname">update_struct_vals</code><span class="sig-paren">(</span><em>removed</em>, <em>added</em><span class="sig-paren">)</span><a class="headerlink" href="#eisdcore.DataEISD.update_struct_vals" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update optParams for a removed and added structure
+:param removed: a removed Structure object
+:param added: an added Structure object</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="eisdcore.EISDOPT">
+<em class="property">class </em><code class="descclassname">eisdcore.</code><code class="descname">EISDOPT</code><span class="sig-paren">(</span><em>pdb_dir</em>, <em>prior</em>, <em>data_eisd</em>, <em>savefile</em>, <em>subsize=1000</em>, <em>verbose=True</em>, <em>stats_file=None</em>, <em>restartfile=None</em>, <em>cool_sched=None</em>, <em>run_shiftx=False</em><span class="sig-paren">)</span><a class="headerlink" href="#eisdcore.EISDOPT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for optimizing an ensemble based on EISD probabilities. This one
+is written to be compatible with DataEISDFast</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pdb_dir</strong> &#8211; path to full ensemble of pdb structures</li>
+<li><strong>prior</strong> &#8211; a BasePrior object</li>
+<li><strong>data_eisd</strong> &#8211; a DataEISDFast object</li>
+<li><strong>savefile</strong> &#8211; file to save best ensemble to (list of pdb names)</li>
+<li><strong>subsize</strong> &#8211; size of sub-ensemble to optimize</li>
+<li><strong>verbose</strong> &#8211; if True, will print updates</li>
+<li><strong>stats_file</strong> &#8211; file to save statistics to (optional)</li>
+<li><strong>cool_sched</strong> &#8211; a BaseCoolSched object</li>
+<li><strong>run_shiftx</strong> &#8211; run SHIFTX on every built structure</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="eisdcore.EISDOPT._build_start_set">
+<code class="descname">_build_start_set</code><span class="sig-paren">(</span><em>restartfile=None</em><span class="sig-paren">)</span><a class="headerlink" href="#eisdcore.EISDOPT._build_start_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a random start set of structures</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of files and list of Structure objects</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="eisdcore.EISDOPT._calc_data_prob">
+<code class="descname">_calc_data_prob</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#eisdcore.EISDOPT._calc_data_prob" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the probability of the data for the current set of structures
+:return: probability of data</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="eisdcore.EISDOPT._perturb">
+<code class="descname">_perturb</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#eisdcore.EISDOPT._perturb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Randomly remove a structure and add a random structure from the
+reservoir</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="eisdcore.EISDOPT._restore">
+<code class="descname">_restore</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#eisdcore.EISDOPT._restore" title="Permalink to this definition">¶</a></dt>
+<dd><p>Restore the system to its state before the last perturbation</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="eisdcore.EISDOPT.opt">
+<code class="descname">opt</code><span class="sig-paren">(</span><em>niter</em><span class="sig-paren">)</span><a class="headerlink" href="#eisdcore.EISDOPT.opt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform simulated annealing procedure to find the subset of structures
+that maximimizes probability. Requires the number of iterations</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>niter</strong> &#8211; number of iterations</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-backcalc">
+<span id="backcalc"></span><h2>backcalc<a class="headerlink" href="#module-backcalc" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="backcalc.BaseBackCalculator">
+<em class="property">class </em><code class="descclassname">backcalc.</code><code class="descname">BaseBackCalculator</code><span class="sig-paren">(</span><em>nparams</em><span class="sig-paren">)</span><a class="headerlink" href="#backcalc.BaseBackCalculator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract base class for back calculators</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>nparams</strong> &#8211; number of nuisance parameters</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="backcalc.BaseBackCalculator.back_calc">
+<code class="descname">back_calc</code><span class="sig-paren">(</span><em>xi</em>, <em>params</em><span class="sig-paren">)</span><a class="headerlink" href="#backcalc.BaseBackCalculator.back_calc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform the back-calculation given a structural measurement and
+necessary parameters.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>xi</strong> &#8211; a Measurement returned by self.get_struct_data()</li>
+<li><strong>params</strong> &#8211; list of nuisance parameter values for this back-calc</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a Measurement object containing the back-calculated value</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="backcalc.BaseBackCalculator.calc_opt_params">
+<code class="descname">calc_opt_params</code><span class="sig-paren">(</span><em>n</em>, <em>precalc_params</em>, <em>sig_eps</em>, <em>exp_val</em><span class="sig-paren">)</span><a class="headerlink" href="#backcalc.BaseBackCalculator.calc_opt_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given all structural measurements, calculate the optimal
+paramater set and return the total probability with those
+parameters (i.e. the optimal function value). This version is a
+fast implementation that uses pre-computed values of structural
+measurements
+:param n: number of structures
+:param precalc_params: pre-calculated sums over structural measurements
+:param sig_eps: std of experimental error
+:param exp_val: experimental value
+:return: list of optimal parameters, optimal function value</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="backcalc.BaseBackCalculator.get_default_err">
+<code class="descname">get_default_err</code><span class="sig-paren">(</span><em>data_id</em><span class="sig-paren">)</span><a class="headerlink" href="#backcalc.BaseBackCalculator.get_default_err" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the default (i.e. most probable) error for this back-calculator</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data_id</strong> &#8211; a DataID object</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the default error corresponding to the input data id</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="backcalc.BaseBackCalculator.get_default_params">
+<code class="descname">get_default_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backcalc.BaseBackCalculator.get_default_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the default parameters for this back-calculator</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">List of default values (one for each param)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="backcalc.BaseBackCalculator.get_default_struct_val">
+<code class="descname">get_default_struct_val</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backcalc.BaseBackCalculator.get_default_struct_val" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a default structural value for the relevant
+structural information needed by this back-calculator.
+Used to initialize models</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">default Measurement object</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="backcalc.BaseBackCalculator.get_err_sig">
+<code class="descname">get_err_sig</code><span class="sig-paren">(</span><em>data_id</em><span class="sig-paren">)</span><a class="headerlink" href="#backcalc.BaseBackCalculator.get_err_sig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get error standard deviation for a data point</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data_id</strong> &#8211; DataID object for the data point</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="backcalc.BaseBackCalculator.get_random_err">
+<code class="descname">get_random_err</code><span class="sig-paren">(</span><em>data_id</em><span class="sig-paren">)</span><a class="headerlink" href="#backcalc.BaseBackCalculator.get_random_err" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a value drawn from the error distribution of this back-calculator</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data_id</strong> &#8211; a DataID object</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a random error taken from the distribution corresponding to
+the input data id</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="backcalc.BaseBackCalculator.get_random_params">
+<code class="descname">get_random_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backcalc.BaseBackCalculator.get_random_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get values drawn randomly  from the distributions of this
+back-calculator&#8217;s parameters</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">List of random values (one for each param)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="backcalc.BaseBackCalculator.logp_err">
+<code class="descname">logp_err</code><span class="sig-paren">(</span><em>err</em>, <em>data_id</em><span class="sig-paren">)</span><a class="headerlink" href="#backcalc.BaseBackCalculator.logp_err" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the log probability of an error</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>err</strong> &#8211; the error value</li>
+<li><strong>data_id</strong> &#8211; the DataID corresponding to the input error</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the log probability of the input error</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="backcalc.BaseBackCalculator.logp_params">
+<code class="descname">logp_params</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="headerlink" href="#backcalc.BaseBackCalculator.logp_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the log probability of a set of parameter values</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>params</strong> &#8211; list of input parameters for this back-calculator</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">log probability of the input parameters</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="backcalc.JCoupBackCalc">
+<em class="property">class </em><code class="descclassname">backcalc.</code><code class="descname">JCoupBackCalc</code><span class="sig-paren">(</span><em>err_mu=0</em>, <em>err_sig=0.73</em>, <em>mu_a=6.51</em>, <em>mu_b=-1.76</em>, <em>mu_c=1.6</em>, <em>sig_a=0.37416573867739417</em>, <em>sig_b=0.17320508075688773</em>, <em>sig_c=0.28284271247461901</em><span class="sig-paren">)</span><a class="headerlink" href="#backcalc.JCoupBackCalc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Back calculator for J-coupling constants from dihedral angles
+Calculation is done with the Karplus equation:
+$$ J(phi) = Acos^2(phi) + Bcos(phi) + C $$
+Constructor requires parameters for the Gaussian random variables
+that will represent the coefficients in the Karplus equation
+and a dictionary containing the errors mean and standard deviations
+for every type of structural measurement. Default Karplus coeff means,
+stdevs and and error stdev are the values based on those in:</p>
+<blockquote>
+<div>Vuister and Bax, &#8220;Quantatative J Correlation: a new approach for
+meausuring homonuclear
+three bond J coupling constants in N15 eriched proteins&#8221;
+<em>J.Am.Chem.Soc</em>, <strong>1993</strong>, <em>115</em> (17). pp 7772:7777</div></blockquote>
+<dl class="method">
+<dt id="backcalc.JCoupBackCalc.back_calc">
+<code class="descname">back_calc</code><span class="sig-paren">(</span><em>xi</em>, <em>back_params</em><span class="sig-paren">)</span><a class="headerlink" href="#backcalc.JCoupBackCalc.back_calc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implemenation of the Karplus equation. See BaseBackCalculator for more
+info</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>xi</strong> &#8211; </li>
+<li><strong>back_params</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="backcalc.JCoupBackCalc.calc_opt_params">
+<code class="descname">calc_opt_params</code><span class="sig-paren">(</span><em>n</em>, <em>alphas</em>, <em>sig_eps</em>, <em>exp_val</em><span class="sig-paren">)</span><a class="headerlink" href="#backcalc.JCoupBackCalc.calc_opt_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Analytically calculate the optimal A, B and C in the Karplus equation.
+For more info see BaseBackCalculator
+:param n: number of structures
+:param alphas: pre-calculated sum over cosines of phi angles
+:param sig_eps:
+:param exp_val:
+:return: optimal A, B, C in a list</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="backcalc.JCoupBackCalc.get_default_err">
+<code class="descname">get_default_err</code><span class="sig-paren">(</span><em>data_id=None</em><span class="sig-paren">)</span><a class="headerlink" href="#backcalc.JCoupBackCalc.get_default_err" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default if mean of error distribution See BaseBackCalculator for more
+info</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data_id</strong> &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="backcalc.JCoupBackCalc.get_default_params">
+<code class="descname">get_default_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backcalc.JCoupBackCalc.get_default_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return mean of param values. See BaseBackCalculator for more info</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="backcalc.JCoupBackCalc.get_default_struct_val">
+<code class="descname">get_default_struct_val</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backcalc.JCoupBackCalc.get_default_struct_val" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default is [pi, pi] dihedral angle. See BaseBackCalculator for more info</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="backcalc.JCoupBackCalc.get_err_sig">
+<code class="descname">get_err_sig</code><span class="sig-paren">(</span><em>data_id=None</em><span class="sig-paren">)</span><a class="headerlink" href="#backcalc.JCoupBackCalc.get_err_sig" title="Permalink to this definition">¶</a></dt>
+<dd><p>See BaseBackCalculator for more info</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data_id</strong> &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="backcalc.JCoupBackCalc.get_random_err">
+<code class="descname">get_random_err</code><span class="sig-paren">(</span><em>data_id=None</em><span class="sig-paren">)</span><a class="headerlink" href="#backcalc.JCoupBackCalc.get_random_err" title="Permalink to this definition">¶</a></dt>
+<dd><p>data_id is optional for this back-calculator. See BaseBackCalculator for
+more info</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data_id</strong> &#8211; </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="backcalc.JCoupBackCalc.get_random_params">
+<code class="descname">get_random_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backcalc.JCoupBackCalc.get_random_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>See BaseBackCalculator for more info</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="backcalc.JCoupBackCalc.logp_err">
+<code class="descname">logp_err</code><span class="sig-paren">(</span><em>err</em>, <em>data_id=None</em><span class="sig-paren">)</span><a class="headerlink" href="#backcalc.JCoupBackCalc.logp_err" title="Permalink to this definition">¶</a></dt>
+<dd><p>Error is represemted as a normal. See BaseBackCalculator for more info</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>err</strong> &#8211; </li>
+<li><strong>data_id</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="backcalc.JCoupBackCalc.logp_params">
+<code class="descname">logp_params</code><span class="sig-paren">(</span><em>params</em><span class="sig-paren">)</span><a class="headerlink" href="#backcalc.JCoupBackCalc.logp_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameters are represented as normals. See BaseBackCalculator for more
+info</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>params</strong> &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="backcalc.ShiftBackCalc">
+<em class="property">class </em><code class="descclassname">backcalc.</code><code class="descname">ShiftBackCalc</code><a class="headerlink" href="#backcalc.ShiftBackCalc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Back calculator for converting pdb files to chemical shifts.
+Uses SHIFTX2 for the back-calculation, which has no nuisance
+parameters</p>
+<dl class="method">
+<dt id="backcalc.ShiftBackCalc.back_calc">
+<code class="descname">back_calc</code><span class="sig-paren">(</span><em>xi</em>, <em>params=None</em><span class="sig-paren">)</span><a class="headerlink" href="#backcalc.ShiftBackCalc.back_calc" title="Permalink to this definition">¶</a></dt>
+<dd><p>In this case, xi contains the back-calculated measurement.
+See BaseBackCalculator for more info.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>xi</strong> &#8211; </li>
+<li><strong>params</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="backcalc.ShiftBackCalc.calc_opt_params">
+<code class="descname">calc_opt_params</code><span class="sig-paren">(</span><em>n</em>, <em>beta_sig</em>, <em>sig_eps</em>, <em>exp_val</em><span class="sig-paren">)</span><a class="headerlink" href="#backcalc.ShiftBackCalc.calc_opt_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Analytically calculate the optimal back-calculation error.
+For more info see BaseBackCalculator</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>n</strong> &#8211; number of structures</li>
+<li><strong>beta_sig</strong> &#8211; [sum of shift back calculations, std for this atom]</li>
+<li><strong>sig_eps</strong> &#8211; </li>
+<li><strong>exp_val</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">optimal back calculator error in a list</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="backcalc.ShiftBackCalc.get_default_err">
+<code class="descname">get_default_err</code><span class="sig-paren">(</span><em>data_id=None</em><span class="sig-paren">)</span><a class="headerlink" href="#backcalc.ShiftBackCalc.get_default_err" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default is 0.0. See BaseBackCalculator for more info</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data_id</strong> &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="backcalc.ShiftBackCalc.get_default_params">
+<code class="descname">get_default_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backcalc.ShiftBackCalc.get_default_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>No nuisance parameters required for this model. See BaseBackCalculator
+for more info</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="backcalc.ShiftBackCalc.get_default_struct_val">
+<code class="descname">get_default_struct_val</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backcalc.ShiftBackCalc.get_default_struct_val" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a shift id for the first measurement of the first
+structure</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="backcalc.ShiftBackCalc.get_err_sig">
+<code class="descname">get_err_sig</code><span class="sig-paren">(</span><em>data_id</em><span class="sig-paren">)</span><a class="headerlink" href="#backcalc.ShiftBackCalc.get_err_sig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the std corresponding to the SHIFTX2 rmsd for this data id</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data_id</strong> &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="backcalc.ShiftBackCalc.get_random_err">
+<code class="descname">get_random_err</code><span class="sig-paren">(</span><em>data_id</em><span class="sig-paren">)</span><a class="headerlink" href="#backcalc.ShiftBackCalc.get_random_err" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a random value from the normal distribution corresponding
+to the SHIFTX2 rmsd value for this data id. See BaseBackCalculator
+for more info</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data_id</strong> &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="backcalc.ShiftBackCalc.get_random_params">
+<code class="descname">get_random_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#backcalc.ShiftBackCalc.get_random_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>No nuisance parameters required for this model. See BaseBackCalculator
+for more info</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="backcalc.ShiftBackCalc.logp_err">
+<code class="descname">logp_err</code><span class="sig-paren">(</span><em>err</em>, <em>data_id</em><span class="sig-paren">)</span><a class="headerlink" href="#backcalc.ShiftBackCalc.logp_err" title="Permalink to this definition">¶</a></dt>
+<dd><p>Error represented as gaussian with std based on SHIFTX2 reported rmsd
+See BaseBackCalculator for more info</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>err</strong> &#8211; </li>
+<li><strong>data_id</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="backcalc.ShiftBackCalc.logp_params">
+<code class="descname">logp_params</code><span class="sig-paren">(</span><em>params=None</em><span class="sig-paren">)</span><a class="headerlink" href="#backcalc.ShiftBackCalc.logp_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>No nuisance parameters required for this model. See BaseBackCalculator
+for more info</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>params</strong> &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-priors">
+<span id="priors"></span><h2>priors<a class="headerlink" href="#module-priors" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="priors.BasePrior">
+<em class="property">class </em><code class="descclassname">priors.</code><code class="descname">BasePrior</code><a class="headerlink" href="#priors.BasePrior" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract base class for prior distributions</p>
+<dl class="method">
+<dt id="priors.BasePrior.calc_prior_logp">
+<code class="descname">calc_prior_logp</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#priors.BasePrior.calc_prior_logp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the prior log probability for a list of Structures that make
+up an ensemble</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>args</strong> &#8211; specific arguments</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">log probability of ensemble in this prior distribution</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="priors.BasePrior.get_arg">
+<code class="descname">get_arg</code><span class="sig-paren">(</span><em>struct</em><span class="sig-paren">)</span><a class="headerlink" href="#priors.BasePrior.get_arg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build the arguments required to calculate the prior given a
+single structure. So the input to calc_prior_logp shoudl be a
+list of these args</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>struct</strong> &#8211; a Structure object</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="priors.UniformPrior">
+<em class="property">class </em><code class="descclassname">priors.</code><code class="descname">UniformPrior</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#priors.UniformPrior" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uniform prior distribuiton across space of ensembles</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n</strong> &#8211; number of candidate ensembles</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="priors.UniformPrior.calc_prior_logp">
+<code class="descname">calc_prior_logp</code><span class="sig-paren">(</span><em>arg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#priors.UniformPrior.calc_prior_logp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Probability is just 1/n. See BasePrior for more info
+:param arg: placeholder argument to assure inheritance works correctly
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="priors.UniformPrior.get_arg">
+<code class="descname">get_arg</code><span class="sig-paren">(</span><em>struct=None</em><span class="sig-paren">)</span><a class="headerlink" href="#priors.UniformPrior.get_arg" title="Permalink to this definition">¶</a></dt>
+<dd><p>No arguments for this prior. See BasePrior for more info</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>struct</strong> &#8211; a Structure object</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-eisdstructure">
+<span id="eisdstructure"></span><h2>eisdstructure<a class="headerlink" href="#module-eisdstructure" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="eisdstructure.Structure">
+<em class="property">class </em><code class="descclassname">eisdstructure.</code><code class="descname">Structure</code><span class="sig-paren">(</span><em>pdbfile</em>, <em>shiftxfile=None</em>, <em>runshiftx=None</em>, <em>energy=None</em><span class="sig-paren">)</span><a class="headerlink" href="#eisdstructure.Structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for representing and modifying protein structures. Interfaces
+significantly with MMTK.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pdbfile</strong> &#8211; path to the pdbfile containing the representation of this
+structure</li>
+<li><strong>shiftxfile</strong> &#8211; file containing back-calculated SHIFTX2 data for this
+structure</li>
+<li><strong>runshiftx</strong> &#8211; an optional RunShiftX instance</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="eisdstructure.Structure._get_all_dihed">
+<code class="descname">_get_all_dihed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#eisdstructure.Structure._get_all_dihed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve all phi, psi dihedral angles in this structure</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a {res_num: (phi, psi)} dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="eisdstructure.Structure.get_struct_measure">
+<code class="descname">get_struct_measure</code><span class="sig-paren">(</span><em>exp_id</em><span class="sig-paren">)</span><a class="headerlink" href="#eisdstructure.Structure.get_struct_measure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a structural measurement from a DataID corresponding to an
+experimental measurement. This structural measurement can be
+input into a back-calculator</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>exp_id</strong> &#8211; An experimental data ID (ShiftID or JCoupID)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-readutil">
+<span id="readutil"></span><h2>readutil<a class="headerlink" href="#module-readutil" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="readutil.BaseDataID">
+<em class="property">class </em><code class="descclassname">readutil.</code><code class="descname">BaseDataID</code><a class="headerlink" href="#readutil.BaseDataID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for objects that contain unique IDs for data points. The goal
+of these classes is to ensure that experimental measurements are
+solidly connected to the corresponding structural and back-calculation
+measurements. These IDs must be hashable and have equality comparisons</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="readutil.JCoupID">
+<em class="property">class </em><code class="descclassname">readutil.</code><code class="descname">JCoupID</code><span class="sig-paren">(</span><em>res_num</em><span class="sig-paren">)</span><a class="headerlink" href="#readutil.JCoupID" title="Permalink to this definition">¶</a></dt>
+<dd><p>ID objects for j coupling values. Only requires a residue number</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>res_num</strong> &#8211; residue number of measurement</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="readutil.Measurement">
+<em class="property">class </em><code class="descclassname">readutil.</code><code class="descname">Measurement</code><span class="sig-paren">(</span><em>data_id=None</em>, <em>val=None</em><span class="sig-paren">)</span><a class="headerlink" href="#readutil.Measurement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for storing all of the info in a data measurement
+(experimental or structural). Contains a data ID and a value</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data_id</strong> &#8211; a BaseDataID object</li>
+<li><strong>val</strong> &#8211; value of the measurement</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="readutil.RunShiftX">
+<em class="property">class </em><code class="descclassname">readutil.</code><code class="descname">RunShiftX</code><span class="sig-paren">(</span><em>exe='/usr/local/bin/shiftx2/shiftx2.py'</em>, <em>tempdir='./tmp/'</em><span class="sig-paren">)</span><a class="headerlink" href="#readutil.RunShiftX" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for running the SHIFTX2 command line program</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>exe</strong> &#8211; path to SHIFTX2 executable</li>
+<li><strong>tempdir</strong> &#8211; path to a directory to story temporary files</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="readutil.RunShiftX._clean">
+<code class="descname">_clean</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#readutil.RunShiftX._clean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes temporary files</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="readutil.RunShiftX.read_ouput">
+<em class="property">static </em><code class="descname">read_ouput</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="headerlink" href="#readutil.RunShiftX.read_ouput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads a SHIFTX2 output file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> &#8211; output file to be read</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">{ShiftID: shift_val} dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="readutil.RunShiftX.run_shiftx_once">
+<code class="descname">run_shiftx_once</code><span class="sig-paren">(</span><em>inpath</em>, <em>backbone_only=False</em>, <em>clean=True</em>, <em>no_output=True</em><span class="sig-paren">)</span><a class="headerlink" href="#readutil.RunShiftX.run_shiftx_once" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs SHIFTX2 for a single input pdb file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>inpath</strong> &#8211; path to input pdb file</li>
+<li><strong>backbone_only</strong> &#8211; True if SHIFTX2 should only run for backbone atoms</li>
+<li><strong>clean</strong> &#8211; True if the temporary files should be deleted</li>
+<li><strong>no_output</strong> &#8211; If true, no SHIFTX2 ouput will be shown on</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">path to output &#8221;.cs&#8221; file</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="readutil.ShiftID">
+<em class="property">class </em><code class="descclassname">readutil.</code><code class="descname">ShiftID</code><span class="sig-paren">(</span><em>res_num</em>, <em>atom_name</em><span class="sig-paren">)</span><a class="headerlink" href="#readutil.ShiftID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Storage objects containing information that identifies a unique chemical
+shift. A shift is defined by a residue number and atom name</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>res_num</strong> &#8211; residue number of measurement</li>
+<li><strong>atom_name</strong> &#8211; name of atom with residue</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="readutil.get_ab42_jcoup_data">
+<code class="descclassname">readutil.</code><code class="descname">get_ab42_jcoup_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#readutil.get_ab42_jcoup_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the J-coupling data for aB42 in ../test_data/</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a {JCoupID: val} dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="readutil.get_ab42_shift_data">
+<code class="descclassname">readutil.</code><code class="descname">get_ab42_shift_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#readutil.get_ab42_shift_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the shift data for aB42 in ../test_data/</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a {ShiftID: val} dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="readutil.get_md_energies">
+<code class="descclassname">readutil.</code><code class="descname">get_md_energies</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#readutil.get_md_energies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the energy file containing all the energies for the
+MD ensemble in ../test_data/</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">{filename: energy} dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="readutil.read_chemshift_data">
+<code class="descclassname">readutil.</code><code class="descname">read_chemshift_data</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="headerlink" href="#readutil.read_chemshift_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a file of experimental chemical shift data. Must be in ENSEMBLE format:</p>
+<p>residue atom shift error</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> &#8211; path to data file.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a {ShiftID: val} dict</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="readutil.read_dihed_file">
+<code class="descclassname">readutil.</code><code class="descname">read_dihed_file</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="headerlink" href="#readutil.read_dihed_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the dihedral angle file written by write_dihed_to_file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">numpy array containg dihedral angles</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="readutil.read_jcoup_data">
+<code class="descclassname">readutil.</code><code class="descname">read_jcoup_data</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="headerlink" href="#readutil.read_jcoup_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a file of experimental j-coupling data. Must be in ENSEMBLE format:</p>
+<p>res1 atom1 res2 atom2 res3 atom3 res4 atom4 J err_low err_up</p>
+<p>Where the last lines are standard deviations.
+Currently the only usable type is 3JHNHA coupling data.
+:param path: path to data file
+:return: a {JCoupID: val} dict</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="readutil.read_opt_out_file">
+<code class="descclassname">readutil.</code><code class="descname">read_opt_out_file</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="headerlink" href="#readutil.read_opt_out_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the output of an optimization run
+:param path: path to the optimization output file
+:return: list of pdb files of representing optimized ensemble</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="readutil.write_dihed_to_file">
+<code class="descclassname">readutil.</code><code class="descname">write_dihed_to_file</code><span class="sig-paren">(</span><em>structs</em>, <em>outname</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#readutil.write_dihed_to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the dihedral angles of a list of structures into a tab-separated
+file where each line represents a single structure and the columns
+alternate phi, psi angles for each residue</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>structs</strong> &#8211; list of Structure objects</li>
+<li><strong>outname</strong> &#8211; path to where the dihed file should be written</li>
+<li><strong>verbose</strong> &#8211; If True updates will be written to terminal</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-util">
+<span id="util"></span><h2>util<a class="headerlink" href="#module-util" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="util.BaseCoolSched">
+<em class="property">class </em><code class="descclassname">util.</code><code class="descname">BaseCoolSched</code><span class="sig-paren">(</span><em>temp0</em>, <em>scale</em><span class="sig-paren">)</span><a class="headerlink" href="#util.BaseCoolSched" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for cooling schedules. All cooling schedules require and
+starting temperature and scale
+:param temp0: starting temperature
+:param scale: rate of change</p>
+<dl class="method">
+<dt id="util.BaseCoolSched.calc_temp">
+<code class="descname">calc_temp</code><span class="sig-paren">(</span><em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#util.BaseCoolSched.calc_temp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the temperature given a time
+:param t: time as fraction of total iterations
+:return: temperature</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="util.GaussianCoolSched">
+<em class="property">class </em><code class="descclassname">util.</code><code class="descname">GaussianCoolSched</code><span class="sig-paren">(</span><em>temp0</em>, <em>scale</em><span class="sig-paren">)</span><a class="headerlink" href="#util.GaussianCoolSched" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gaussian cooling schedule: T = T0 * exp(-(scale*t)**2)
+For more info, see BaseCoolSched
+:param temp0: starting temperature
+:param scale: rate of change</p>
+<dl class="method">
+<dt id="util.GaussianCoolSched.calc_temp">
+<code class="descname">calc_temp</code><span class="sig-paren">(</span><em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#util.GaussianCoolSched.calc_temp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates gaussian cooled temperature
+:param t:
+:return:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="util.LinearCoolSched">
+<em class="property">class </em><code class="descclassname">util.</code><code class="descname">LinearCoolSched</code><span class="sig-paren">(</span><em>temp0</em>, <em>scale</em><span class="sig-paren">)</span><a class="headerlink" href="#util.LinearCoolSched" title="Permalink to this definition">¶</a></dt>
+<dd><p>Linear schedule: T = T0 - scale*t
+For more info, see BaseCoolSched
+:param temp0: starting temperature
+:param scale: rate of change</p>
+<dl class="method">
+<dt id="util.LinearCoolSched.calc_temp">
+<code class="descname">calc_temp</code><span class="sig-paren">(</span><em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#util.LinearCoolSched.calc_temp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates linear cooled temperature
+:param t:
+:return:</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="util.calc_psrf">
+<code class="descclassname">util.</code><code class="descname">calc_psrf</code><span class="sig-paren">(</span><em>inseqs</em>, <em>rand_toss=False</em><span class="sig-paren">)</span><a class="headerlink" href="#util.calc_psrf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the Potential Scale Reduction Factor (PSRF) for convergence
+of an iterative process. The PSRF approaches one as the process becomes
+more converged. For more info, see :
+Gelman, Andrew, and Donald B. Rubin. &#8220;Inference from iterative simulation
+using multiple sequences.&#8221; Statistical science (1992): 457-472.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>inseqs</strong> &#8211; list of m simulation sequences of length 2n</li>
+<li><strong>rand_toss</strong> &#8211; throw away half of the iterations from each sequence
+randomly (otherwise throw away the first half)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">PSRF value</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="util.normal_log_deriv">
+<code class="descclassname">util.</code><code class="descname">normal_log_deriv</code><span class="sig-paren">(</span><em>x</em>, <em>mu</em>, <em>sig</em><span class="sig-paren">)</span><a class="headerlink" href="#util.normal_log_deriv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Derivative of the log of the normal distribution with respect to x
+:param x: value to be tested
+:param mu: mean
+:param sig: variance
+:return: d/dx</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="util.normal_loglike">
+<code class="descclassname">util.</code><code class="descname">normal_loglike</code><span class="sig-paren">(</span><em>x</em>, <em>mu</em>, <em>sig</em><span class="sig-paren">)</span><a class="headerlink" href="#util.normal_loglike" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the log likelihood of a value x in a normal distribution with
+mean mu and stdev sig.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>x</strong> &#8211; list of values to calculate probability of</li>
+<li><strong>mu</strong> &#8211; mean of distribuiton</li>
+<li><strong>sig</strong> &#8211; standard deviation of distribution</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="util.timeit">
+<code class="descclassname">util.</code><code class="descname">timeit</code><span class="sig-paren">(</span><em>f</em><span class="sig-paren">)</span><a class="headerlink" href="#util.timeit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Timing decorator for a function f
+:param f: a function
+:return: timing</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-setupeisd">
+<span id="setupeisd"></span><h2>setupeisd<a class="headerlink" href="#module-setupeisd" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="setupeisd.InputFile">
+<em class="property">class </em><code class="descclassname">setupeisd.</code><code class="descname">InputFile</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="headerlink" href="#setupeisd.InputFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class for reading EISD input files
+:param path: path to input file</p>
+<dl class="method">
+<dt id="setupeisd.InputFile._check_params">
+<code class="descname">_check_params</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#setupeisd.InputFile._check_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check to make sure the input valid has a valid parameter list
+:return: a boolean stating whether the input file is valid</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="setupeisd.InputFile._find_keyword">
+<code class="descname">_find_keyword</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="headerlink" href="#setupeisd.InputFile._find_keyword" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find and set values for keywords
+:param line: the line to search for a keyword</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="setupeisd.InputFile._read_file">
+<code class="descname">_read_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#setupeisd.InputFile._read_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the input file and set keywords</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="setupeisd.SetupOpt">
+<em class="property">class </em><code class="descclassname">setupeisd.</code><code class="descname">SetupOpt</code><span class="sig-paren">(</span><em>inp_file</em><span class="sig-paren">)</span><a class="headerlink" href="#setupeisd.SetupOpt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given an input file object, set up an optimization run
+:param inp_file: an InputFile object</p>
+<dl class="method">
+<dt id="setupeisd.SetupOpt._setup_eisd_obj">
+<code class="descname">_setup_eisd_obj</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#setupeisd.SetupOpt._setup_eisd_obj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setup the DataEISD object that will be used
+:return: DataEISD object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="setupeisd.SetupOpt._setup_opt">
+<code class="descname">_setup_opt</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#setupeisd.SetupOpt._setup_opt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setup the optimizer object
+:return: an EISDOPT object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="setupeisd.SetupOpt._setup_prior">
+<code class="descname">_setup_prior</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#setupeisd.SetupOpt._setup_prior" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up the prior distribution
+:return: a BasePrior object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="setupeisd.SetupOpt.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#setupeisd.SetupOpt.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs the full setup optimization</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="references.html" class="btn btn-neutral float-right" title="References">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="use.html" class="btn btn-neutral" title="Use"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, David Brookes and Teresa Head-Gordon.
+    </p>
+  </div>
+
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="static/jquery.js"></script>
+      <script type="text/javascript" src="static/underscore.js"></script>
+      <script type="text/javascript" src="static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
