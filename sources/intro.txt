@@ -1,5 +1,5 @@
 .. EISD documentation introduction file, created by
-.. include:: use.rst
+
 Getting Started
 ===============
 
