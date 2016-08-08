@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Getting Started &mdash; EISD 0.1 documentation</title>
+  <title>Use &mdash; EISD 0.2 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="EISD 0.1 documentation" href="index.html"/>
+    <link rel="top" title="EISD 0.2 documentation" href="index.html"/>
         <link rel="next" title="Use" href="use.html"/>
         <link rel="prev" title="Welcome!" href="index.html"/> 
 
@@ -64,7 +64,13 @@
           
           
               <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="">Getting Started</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Use</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#input-file">Input File</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#experimental-data-files">Experimental Data Files</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#getting-started">Getting Started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
@@ -72,8 +78,8 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="use.html">Use</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="use.html#overview">Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="use.html#calculating-eisd-probabilities">Calculating EISD probabilities</a></li>
-<li class="toctree-l2"><a class="reference internal" href="use.html#finding-optimal-subsets">Finding optimal subsets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="use.html#input-file">Input File</a></li>
+<li class="toctree-l2"><a class="reference internal" href="use.html#experimental-data-files">Experimental Data Files</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a><ul>
@@ -112,7 +118,7 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-    <li>Getting Started</li>
+    <li>Use</li>
       <li class="wy-breadcrumbs-aside">
         
           <a href="sources/intro.txt" rel="nofollow"> View page source</a>
@@ -123,7 +129,165 @@
 </div>
           <div role="main" class="document">
             
-  <div class="section" id="getting-started">
+  <div class="section" id="use">
+<h1>Use<a class="headerlink" href="#use" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>Given an ensemble of structures and a set of NMR experimental data, EISD
+determines a Bayesian probability that the ensemble fits the experimental data.
+This program embeds this probability calculation in a Simulated Annealing (SA)
+procedure that allows users to find the optimal subset of structures from
+an initial reservoir. At each step of the SA procedure, the current subset
+is perturbed by randomly swapping a structure with one from the reservoir and
+then determining the EISD probability of the perturbed subset. The difference
+in EISD probabilities between the original and perturbed subsets the determines
+the Metropolis acceptance probability for the perturbation, with temperature
+specified by a SA cooling schedule. This procedure begins by choosing a random
+subset from the reservoir and terminates after a specified number of
+attempted swap iterations.</p>
+</div>
+<div class="section" id="input-file">
+<span id="id1"></span><h2>Input File<a class="headerlink" href="#input-file" title="Permalink to this headline">¶</a></h2>
+<p>In order to run this EISD optimization program from the command line, one must
+given the path to an input file as the first argument:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ eisdrun.py &lt;input_file&gt;
+</pre></div>
+</div>
+<p>This input file is a whitespace-delimited text file that contains all
+user-specified options. Each option is specified on a single line with a
+keyword and value separated by whitespace. Blank lines, lines not containing
+a keyword or lines starting with <code class="code docutils literal"><span class="pre">#</span></code> are ignored:</p>
+<div class="highlight-python"><div class="highlight"><pre>KEYWORD1    value1
+KEYWORD2    value2
+# This is a comment
+
+KEYWORD3    value3
+</pre></div>
+</div>
+<p>The table below describes the possbile keywords and value types. Values
+in parentheses are the only options for those keywords. Scrool to the
+right to see which keywords are required and the default values for those
+that are not.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="12%" />
+<col width="56%" />
+<col width="23%" />
+<col width="9%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Keyword</th>
+<th class="head">Value</th>
+<th class="head">Required?</th>
+<th class="head">Default</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>PDBDIR</td>
+<td>Path to directory containing structure reservoir</td>
+<td>Always</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>SUB_SIZE</td>
+<td>Desired number of structures in output subset</td>
+<td>Always</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>N_ITER</td>
+<td>Number of SA iterations to perform</td>
+<td>Recommended</td>
+<td>50,000</td>
+</tr>
+<tr class="row-odd"><td>SAVE_FILE</td>
+<td>Path to file to file names in optimal subset</td>
+<td>Always</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>STATS_FILE</td>
+<td>Path to file to save run statistics in</td>
+<td>Recommended</td>
+<td>std_out</td>
+</tr>
+<tr class="row-odd"><td>USE_JCOUP</td>
+<td>(true/&#8217;false) Use J coupling experimetal data?</td>
+<td>If USE_SHIFT is false</td>
+<td>false</td>
+</tr>
+<tr class="row-even"><td>JCOUP_PATH</td>
+<td>Path to J coupling data</td>
+<td>If USE_JCOUP is true</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>USE_SHIFT</td>
+<td>(true/false) Use chemical shift  experimental data?</td>
+<td>If USE_SHIFT is false</td>
+<td>false</td>
+</tr>
+<tr class="row-even"><td>SHIFT_PATH</td>
+<td>Path to chemical shift data</td>
+<td>If USE_SHIFT is true&#8217;</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>COOL_SCHED</td>
+<td>(gaussian/linear) Type of SA cooling schedule to use</td>
+<td>No</td>
+<td>gaussian</td>
+</tr>
+<tr class="row-even"><td>COOL_TO</td>
+<td>Starting temperature of cooling schedule</td>
+<td>No</td>
+<td>0.1</td>
+</tr>
+<tr class="row-odd"><td>COOL_SCALE</td>
+<td>Scale of cooling scedule</td>
+<td>No</td>
+<td>2</td>
+</tr>
+<tr class="row-even"><td>PRIOR</td>
+<td>(uniform) Type of prior to use</td>
+<td>No</td>
+<td>uniform</td>
+</tr>
+<tr class="row-odd"><td>PRIOR_UNI_M</td>
+<td>Number of ensembles in uniform prior state space</td>
+<td>No</td>
+<td>10</td>
+</tr>
+<tr class="row-even"><td>RUN_SHIFTX</td>
+<td>(true/false) Run shiftx on every structure?</td>
+<td>No</td>
+<td>false</td>
+</tr>
+<tr class="row-odd"><td>SHIFT_EXE</td>
+<td>Path to SHIFTX executable</td>
+<td>If RUN_SHIFTX is true</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<p>An example input file can be found in <code class="code docutils literal"><span class="pre">$EISD_HOME/test/ab42_example.inp</span></code>.</p>
+</div>
+<div class="section" id="experimental-data-files">
+<h2>Experimental Data Files<a class="headerlink" href="#experimental-data-files" title="Permalink to this headline">¶</a></h2>
+<p>Experimental data files that are input into EISD must have a specific format,
+which is the same as that used in the ENSEMBLE program. The format for each
+experimental data point is described below, with examples.</p>
+<div class="section" id="chemical-shift">
+<h3>Chemical Shift<a class="headerlink" href="#chemical-shift" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre>Residue     Atom    Chemical Shift      Error
+</pre></div>
+</div>
+</div>
+<div class="section" id="j-coupling">
+<h3>J-Coupling<a class="headerlink" href="#j-coupling" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre>Res1    Atom1   Res2    Atom2   Res3    Atom3   Res4    Atom4   J   Err_Low   Err_Up
+</pre></div>
+</div>
+<p>Example files can be found in <code class="code docutils literal"><span class="pre">$EISD_HOME/test/</span></code></p>
+</div>
+</div>
+</div>
+<div class="section" id="getting-started">
 <h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
@@ -132,7 +296,7 @@ Determination, EISD was developed in Teresa Head-Gordon&#8217;s lab at
 UC Berkeley with the goal of providing probability scores to ensembles of
 Intrinsically Disordered Proteins (IDPs) based on their fit to experimental
 data and conformational prior distributions. The theory underlying this
-code is presented in <a class="reference internal" href="references.html#brhe16" id="id1">[BrHe16]</a>.</p>
+code is presented in <a class="reference internal" href="references.html#brhe16" id="id2">[BrHe16]</a>.</p>
 <p>EISD currently allows one to determine probabilities of ensembles using
 a number of different experimental data types and priors, as well as to
 optimize an ensemble by finding the subset of structures with the highest
@@ -143,9 +307,9 @@ probability.</p>
 <p>EISD relies on a number of Python libraries and external programs, listed
 below:</p>
 <ul class="simple">
-<li><strong>SciPy</strong> <a class="reference internal" href="references.html#joop01" id="id2">[JoOP01]</a></li>
-<li><strong>Biopython</strong> <a class="reference internal" href="references.html#cacc09" id="id3">[CACC09]</a></li>
-<li><strong>SHIFTX2</strong> <a class="reference internal" href="references.html#blgw11" id="id4">[BLGW11]</a></li>
+<li><strong>SciPy</strong> <a class="reference internal" href="references.html#joop01" id="id3">[JoOP01]</a></li>
+<li><strong>Biopython</strong> <a class="reference internal" href="references.html#cacc09" id="id4">[CACC09]</a></li>
+<li><strong>SHIFTX2</strong> <a class="reference internal" href="references.html#blgw11" id="id5">[BLGW11]</a></li>
 </ul>
 </div>
 <div class="section" id="installation">
@@ -168,9 +332,11 @@ $ python setup.py
 </pre></div>
 </div>
 <p>EISD can now be run with the command:</p>
-<p>$ eisdrun.py &lt;input_file&gt;</p>
+<div class="highlight-python"><div class="highlight"><pre>$ eisdrun.py &lt;input_file&gt;
+</pre></div>
+</div>
 <p>where <code class="code docutils literal"><span class="pre">&lt;input_file&gt;</span></code> is an EISD input file (described in detail in the
-&#8220;Use&#8221; section)</p>
+<a class="reference internal" href="use.html#input-file"><span>Input File</span></a> section)</p>
 <p>The EISD modules can now be imported into any local python program.</p>
 <p>Users may also want to install <strong>SHIFTX2</strong> for chemical shift prediction, whose download and installation
 instructions can be found on <a class="reference external" href="&quot;http://www.shiftx2.ca/&quot;">their website</a></p>
@@ -216,7 +382,7 @@ instructions can be found on <a class="reference external" href="&quot;http://ww
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.1',
+            VERSION:'0.2',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

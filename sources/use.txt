@@ -6,153 +6,144 @@ Use
 Overview
 --------
 
-EISD
+Given an ensemble of structures and a set of NMR experimental data, EISD
+determines a Bayesian probability that the ensemble fits the experimental data.
+This program embeds this probability calculation in a Simulated Annealing (SA)
+procedure that allows users to find the optimal subset of structures from
+an initial reservoir. At each step of the SA procedure, the current subset
+is perturbed by randomly swapping a structure with one from the reservoir and
+then determining the EISD probability of the perturbed subset. The difference
+in EISD probabilities between the original and perturbed subsets the determines
+the Metropolis acceptance probability for the perturbation, with temperature
+specified by a SA cooling schedule. This procedure begins by choosing a random
+subset from the reservoir and terminates after a specified number of
+attempted swap iterations.
+
+.. _input-file:
+
+Input File
+----------
+
+In order to run this EISD optimization program from the command line, one must
+given the path to an input file as the first argument::
+
+$ eisdrun.py <input_file>
+
+This input file is a whitespace-delimited text file that contains all
+user-specified options. Each option is specified on a single line with a
+keyword and value separated by whitespace. Blank lines, lines not containing
+a keyword or lines starting with :code:`#` are ignored::
+
+    KEYWORD1    value1
+    KEYWORD2    value2
+    # This is a comment
+
+    KEYWORD3    value3
 
 
-Calculating EISD probabilities
-------------------------------
+The table below describes the possbile keywords and value types. Values
+in parentheses are the only options for those keywords. Scrool to the
+right to see which keywords are required and the default values for those
+that are not.
 
-The most basic use of EISD is to determine a probability score based on
-an ensemble of structure's fit to experimental data and some prior distribution on
-conformations. This requires back-calculating experimental observables from the ensemble's structure
-and determining the probability of the error between these values and the
-true experimental value. This procedure is currently implemented for J-coupling
-constants and chemical shifts. Prior probabilities are then calculated separately. EISD
-only currently implements a uniform prior distribution. See [BrHe16]_ for more
-details on these procedures.
++-----------+-----------------------------------------------------+----------------------+---------+
+| Keyword   | Value                                               | Required?            | Default |
++===========+=====================================================+======================+=========+
+| PDBDIR    | Path to directory containing structure reservoir    | Always               |         |
++-----------+-----------------------------------------------------+----------------------+---------+
+| SUB_SIZE  | Desired number of structures in output subset       | Always               |         |
++-----------+-----------------------------------------------------+----------------------+---------+
+| N_ITER    | Number of SA iterations to perform                  | Recommended          | 50,000  |
++-----------+-----------------------------------------------------+----------------------+---------+
+| SAVE_FILE | Path to file to file names in optimal subset        | Always               |         |
++-----------+-----------------------------------------------------+----------------------+---------+
+| STATS_FILE| Path to file to save run statistics in              | Recommended          |std_out  |
++-----------+-----------------------------------------------------+----------------------+---------+
+| USE_JCOUP | (true/'false) Use J coupling experimetal data?      | If USE_SHIFT is false|false    |
++-----------+-----------------------------------------------------+----------------------+---------+
+| JCOUP_PATH| Path to J coupling data                             | If USE_JCOUP is true |         |
++-----------+-----------------------------------------------------+----------------------+---------+
+| USE_SHIFT | (true/false) Use chemical shift  experimental data? | If USE_SHIFT is false|false    |
++-----------+-----------------------------------------------------+----------------------+---------+
+| SHIFT_PATH| Path to chemical shift data                         | If USE_SHIFT is true'|         |
++-----------+-----------------------------------------------------+----------------------+---------+
+| COOL_SCHED| (gaussian/linear) Type of SA cooling schedule to use| No                   |gaussian |
++-----------+-----------------------------------------------------+----------------------+---------+
+| COOL_TO   | Starting temperature of cooling schedule            | No                   |0.1      |
++-----------+-----------------------------------------------------+----------------------+---------+
+| COOL_SCALE| Scale of cooling scedule                            | No                   |2        |
++-----------+-----------------------------------------------------+----------------------+---------+
+| PRIOR     | (uniform) Type of prior to use                      | No                   |uniform  |
++-----------+-----------------------------------------------------+----------------------+---------+
+|PRIOR_UNI_M| Number of ensembles in uniform prior state space    | No                   |10       |
++-----------+-----------------------------------------------------+----------------------+---------+
+| RUN_SHIFTX| (true/false) Run shiftx on every structure?         | No                   |false    |
++-----------+-----------------------------------------------------+----------------------+---------+
+| SHIFT_EXE | Path to SHIFTX executable                           | If RUN_SHIFTX is true|         |
++-----------+-----------------------------------------------------+----------------------+---------+
 
-Below is a tutorial on how to calculate these probabilities using EISD.
-This tutorial assumes that SHIFTX2 has been run on every structure in the ensemble
-and the output files are saved with the ".cs" extension
+An example input file can be found in :code:`$EISD_HOME/test/ab42_example.inp`.
 
-We begin by building the structures in the ensemble using :class:`structure.Structure`::
-
-    import os
-    from eisd.structure import Structure
-
-    pdbdir = "$PATH_TO_ENSEMBLE_DIR$/"  # path to directory of PDB files
-
-    all_pdb_paths = [os.path.join(pdbdir, f) for f in os.listdir(pdbdir) if
-                     ".pdb" in f and ".cs" not in f]
-
-    structs = [Structure(f, shiftxfile=f + ".cs") for f in all_pdb_paths]
-
-Next we load in experimental data. The methods below (found in :mod:`readutil`)
-are specific to the data files in the :code:`test` directory but can adapted
-for any experimental data format, as long as it returns a dictionary with
-:class:`readutil.BaseDataID` objects as keys and :code:`(observable, error)`
-tuples as values::
-
-    import readutil
-
-    jcoup_data = readutil.get_ab42_jcoup_data()
-    shift_data = readutil.get_ab42_shift_data()
-
-Next we build our :class:`backcalc.BaseBackCalculator` objects that will
-be used to approximately calculate experimental observables from structures information::
-
-    from eisd.backcalc import JCoupBackCalc, ShiftBackCalc
-
-    jcoup_back_calc = JCoupBackCalc()
-    shift_back_calc = ShiftBackCalc()
-
-And now we use the above to build :class:`DataEISD` objects that will calculate
-probabilities::
-
-    from eisd.eisd import DataEISD
-
-    shift_eisd = DataEISD(shift_back_calc, shift_data)
-
-    # don't consider back-calc error for j-coupling (error is all in nuisance parameter variability):
-    jcoup_eisd = DataEISD(jcoup_back_calc, jcoup_data, no_bc_err=True)
-
-Now build a :class:`priors.UniformPrior` object assuming there are
-10 ensembles in our hypothesis space (so the prior probability of each is 0.1)::
-
-    from eisd.priors import UniformPrior
-
-    prior = UniformPrior(10)
-
-Now we calculate and print the probability of the ensemble given the
-experimental data and prior distribution::
-
-    shift_logp = shift_eisd.calc_logp(structs)
-    jcoup_logp = jcoup_eisd.calc_logp(structs)
-    prior_logp = prior.calc_prior_logp()
-    total_logp = shift_logp + jcoup_logp + prior_logp()
-
-    outstr = "The ensemble at %s fits chemical shift data with log probability of %.3f, " \
-             "J coupling data with log probability of %.3f and a conformational prior" \
-              "distribution with log probability %.3f" The total log probability is then %.3f" \
-              % (pdbdir, shift_logp, jcoup_logp, prior_logp, total_logp)
-    print outstr
-
-
-Finding optimal subsets
+Experimental Data Files
 -----------------------
 
-Due to EISD's size extensivity, it is ideal for finding the optimal subset of
-an ensemble that maximizes the probabilities found above. This optimization
-is implemented in the using a simulated annealing to swap out structures in the subset
-with structures from the full ensemble.
+Experimental data files that are input into EISD must have a specific format,
+which is the same as that used in the ENSEMBLE program. The format for each
+experimental data point is described below, with examples.
 
-Below is an example showing how to perform this optimization with J-coupling
-and chemical shift experimental data and a Uniform Prior. Again, this assumes
-that SHIFTX2 has been run for every structure in the full ensemble.
+Chemical Shift
+^^^^^^^^^^^^^^
+::
 
-First define the directory where the full ensemble of structures is stored.
-This is referred to as the "reservoir" of structures. Also define the size
-of the subset that will be optimized and the number of iterations of
-simulated annealing to be performed. Additionally provide the path to a  file that will
-contain the names of the pdb files that make up the optimal ensemble, as well
-as a file for storing optimization statistics::
+    Residue     Atom    Chemical Shift      Error
 
-    pdbdir = "$PATH_TO_ENSEMBLE_DIR$/"
-    subset_size = 1000
-    niter = int(1e6)
+J-Coupling
+^^^^^^^^^^
+::
 
-    savefile = "../output/$OPT_FILE$"
-    stats_file = "../output/$STATS_FILE$"
-
-Now build a :class:`priors.BasePrior` object and :class:`eisd.DataEISD` objects
-for each set of experimental data::
-
-    from eisd.priors import UniformPrior
-    from eisd.eisd import DataEISD
-    from backcalc import JCoupBackCalc, ShiftBackCalc
-    import eisd.readutil
-
-    prior = UniformPrior(niter)  # assume every iterations produces a new hypothesis ensemble
-
-    jcoup_eisd = DataEISD(JCoupBackCalc(), eisd.readutil.get_ab42_jcoup_data(),
-                          no_bc_err=True)
-    shift_eisd = DataEISD(ShiftBackCalc(), eisd.readutil.get_ab42_shift_data())
-
-    # put eisd's together in a list:
-    data_eisds = [jcoup_eisd, shift_eisd]
-
-Now define a cooling schedule for simulated annealing. Below is the default
-schedule::
-
-    def cool_sched(t):
-        """
-        Cooling schedule
-
-        :param t: fraction of iterations
-        :return: "Temperature" for simulated annealing
-        """
-        return np.exp(-(2 * t) ** 2)
+    Res1    Atom1   Res2    Atom2   Res3    Atom3   Res4    Atom4   J   Err_Low   Err_Up
 
 
-Now we can build the :class:`eisd.EISDOPT` object and begin the optimization::
+Example files can be found in :code:`$EISD_HOME/test/`
 
-    from eisd.eisd import EISDOPT
 
-    optimizer = EISDOPT(pdbdir, prior, data_eisds, savefile,
-                        subsize=subset_size, verbose=True,
-                        stats_file=stats_file)
 
-    optimizer.opt(niter, cool_sched=cool_sched)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

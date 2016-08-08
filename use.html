@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Use &mdash; EISD 0.1 documentation</title>
+  <title>Use &mdash; EISD 0.2 documentation</title>
   
 
   
@@ -30,9 +30,9 @@
   
 
   
-    <link rel="top" title="EISD 0.1 documentation" href="index.html"/>
+    <link rel="top" title="EISD 0.2 documentation" href="index.html"/>
         <link rel="next" title="Modules" href="modules.html"/>
-        <link rel="prev" title="Getting Started" href="intro.html"/> 
+        <link rel="prev" title="Use" href="intro.html"/> 
 
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
@@ -64,7 +64,13 @@
           
           
               <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="intro.html">Getting Started</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Use</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#input-file">Input File</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#experimental-data-files">Experimental Data Files</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="intro.html#getting-started">Getting Started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="intro.html#introduction">Introduction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="intro.html#dependencies">Dependencies</a></li>
 <li class="toctree-l2"><a class="reference internal" href="intro.html#installation">Installation</a></li>
@@ -72,8 +78,8 @@
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Use</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#calculating-eisd-probabilities">Calculating EISD probabilities</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#finding-optimal-subsets">Finding optimal subsets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#input-file">Input File</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#experimental-data-files">Experimental Data Files</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a><ul>
@@ -127,145 +133,157 @@
 <h1>Use<a class="headerlink" href="#use" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
-<p>EISD</p>
+<p>Given an ensemble of structures and a set of NMR experimental data, EISD
+determines a Bayesian probability that the ensemble fits the experimental data.
+This program embeds this probability calculation in a Simulated Annealing (SA)
+procedure that allows users to find the optimal subset of structures from
+an initial reservoir. At each step of the SA procedure, the current subset
+is perturbed by randomly swapping a structure with one from the reservoir and
+then determining the EISD probability of the perturbed subset. The difference
+in EISD probabilities between the original and perturbed subsets the determines
+the Metropolis acceptance probability for the perturbation, with temperature
+specified by a SA cooling schedule. This procedure begins by choosing a random
+subset from the reservoir and terminates after a specified number of
+attempted swap iterations.</p>
 </div>
-<div class="section" id="calculating-eisd-probabilities">
-<h2>Calculating EISD probabilities<a class="headerlink" href="#calculating-eisd-probabilities" title="Permalink to this headline">¶</a></h2>
-<p>The most basic use of EISD is to determine a probability score based on
-an ensemble of structure&#8217;s fit to experimental data and some prior distribution on
-conformations. This requires back-calculating experimental observables from the ensemble&#8217;s structure
-and determining the probability of the error between these values and the
-true experimental value. This procedure is currently implemented for J-coupling
-constants and chemical shifts. Prior probabilities are then calculated separately. EISD
-only currently implements a uniform prior distribution. See <a class="reference internal" href="references.html#brhe16" id="id1">[BrHe16]</a> for more
-details on these procedures.</p>
-<p>Below is a tutorial on how to calculate these probabilities using EISD.
-This tutorial assumes that SHIFTX2 has been run on every structure in the ensemble
-and the output files are saved with the &#8221;.cs&#8221; extension</p>
-<p>We begin by building the structures in the ensemble using <code class="xref py py-class docutils literal"><span class="pre">structure.Structure</span></code>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">eisd.structure</span> <span class="kn">import</span> <span class="n">Structure</span>
-
-<span class="n">pdbdir</span> <span class="o">=</span> <span class="s">&quot;$PATH_TO_ENSEMBLE_DIR$/&quot;</span>  <span class="c"># path to directory of PDB files</span>
-
-<span class="n">all_pdb_paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pdbdir</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">pdbdir</span><span class="p">)</span> <span class="k">if</span>
-                 <span class="s">&quot;.pdb&quot;</span> <span class="ow">in</span> <span class="n">f</span> <span class="ow">and</span> <span class="s">&quot;.cs&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">f</span><span class="p">]</span>
-
-<span class="n">structs</span> <span class="o">=</span> <span class="p">[</span><span class="n">Structure</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">shiftxfile</span><span class="o">=</span><span class="n">f</span> <span class="o">+</span> <span class="s">&quot;.cs&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">all_pdb_paths</span><span class="p">]</span>
+<div class="section" id="input-file">
+<span id="id1"></span><h2>Input File<a class="headerlink" href="#input-file" title="Permalink to this headline">¶</a></h2>
+<p>In order to run this EISD optimization program from the command line, one must
+given the path to an input file as the first argument:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ eisdrun.py &lt;input_file&gt;
 </pre></div>
 </div>
-<p>Next we load in experimental data. The methods below (found in <a class="reference internal" href="modules.html#module-readutil" title="readutil"><code class="xref py py-mod docutils literal"><span class="pre">readutil</span></code></a>)
-are specific to the data files in the <code class="code docutils literal"><span class="pre">test</span></code> directory but can adapted
-for any experimental data format, as long as it returns a dictionary with
-<a class="reference internal" href="modules.html#readutil.BaseDataID" title="readutil.BaseDataID"><code class="xref py py-class docutils literal"><span class="pre">readutil.BaseDataID</span></code></a> objects as keys and <code class="code docutils literal"><span class="pre">(observable,</span> <span class="pre">error)</span></code>
-tuples as values:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">readutil</span>
+<p>This input file is a whitespace-delimited text file that contains all
+user-specified options. Each option is specified on a single line with a
+keyword and value separated by whitespace. Blank lines, lines not containing
+a keyword or lines starting with <code class="code docutils literal"><span class="pre">#</span></code> are ignored:</p>
+<div class="highlight-python"><div class="highlight"><pre>KEYWORD1    value1
+KEYWORD2    value2
+# This is a comment
 
-<span class="n">jcoup_data</span> <span class="o">=</span> <span class="n">readutil</span><span class="o">.</span><span class="n">get_ab42_jcoup_data</span><span class="p">()</span>
-<span class="n">shift_data</span> <span class="o">=</span> <span class="n">readutil</span><span class="o">.</span><span class="n">get_ab42_shift_data</span><span class="p">()</span>
+KEYWORD3    value3
 </pre></div>
 </div>
-<p>Next we build our <a class="reference internal" href="modules.html#backcalc.BaseBackCalculator" title="backcalc.BaseBackCalculator"><code class="xref py py-class docutils literal"><span class="pre">backcalc.BaseBackCalculator</span></code></a> objects that will
-be used to approximately calculate experimental observables from structures information:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">eisd.backcalc</span> <span class="kn">import</span> <span class="n">JCoupBackCalc</span><span class="p">,</span> <span class="n">ShiftBackCalc</span>
-
-<span class="n">jcoup_back_calc</span> <span class="o">=</span> <span class="n">JCoupBackCalc</span><span class="p">()</span>
-<span class="n">shift_back_calc</span> <span class="o">=</span> <span class="n">ShiftBackCalc</span><span class="p">()</span>
+<p>The table below describes the possbile keywords and value types. Values
+in parentheses are the only options for those keywords. Scrool to the
+right to see which keywords are required and the default values for those
+that are not.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="12%" />
+<col width="56%" />
+<col width="23%" />
+<col width="9%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Keyword</th>
+<th class="head">Value</th>
+<th class="head">Required?</th>
+<th class="head">Default</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>PDBDIR</td>
+<td>Path to directory containing structure reservoir</td>
+<td>Always</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>SUB_SIZE</td>
+<td>Desired number of structures in output subset</td>
+<td>Always</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>N_ITER</td>
+<td>Number of SA iterations to perform</td>
+<td>Recommended</td>
+<td>50,000</td>
+</tr>
+<tr class="row-odd"><td>SAVE_FILE</td>
+<td>Path to file to file names in optimal subset</td>
+<td>Always</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>STATS_FILE</td>
+<td>Path to file to save run statistics in</td>
+<td>Recommended</td>
+<td>std_out</td>
+</tr>
+<tr class="row-odd"><td>USE_JCOUP</td>
+<td>(true/&#8217;false) Use J coupling experimetal data?</td>
+<td>If USE_SHIFT is false</td>
+<td>false</td>
+</tr>
+<tr class="row-even"><td>JCOUP_PATH</td>
+<td>Path to J coupling data</td>
+<td>If USE_JCOUP is true</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>USE_SHIFT</td>
+<td>(true/false) Use chemical shift  experimental data?</td>
+<td>If USE_SHIFT is false</td>
+<td>false</td>
+</tr>
+<tr class="row-even"><td>SHIFT_PATH</td>
+<td>Path to chemical shift data</td>
+<td>If USE_SHIFT is true&#8217;</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>COOL_SCHED</td>
+<td>(gaussian/linear) Type of SA cooling schedule to use</td>
+<td>No</td>
+<td>gaussian</td>
+</tr>
+<tr class="row-even"><td>COOL_TO</td>
+<td>Starting temperature of cooling schedule</td>
+<td>No</td>
+<td>0.1</td>
+</tr>
+<tr class="row-odd"><td>COOL_SCALE</td>
+<td>Scale of cooling scedule</td>
+<td>No</td>
+<td>2</td>
+</tr>
+<tr class="row-even"><td>PRIOR</td>
+<td>(uniform) Type of prior to use</td>
+<td>No</td>
+<td>uniform</td>
+</tr>
+<tr class="row-odd"><td>PRIOR_UNI_M</td>
+<td>Number of ensembles in uniform prior state space</td>
+<td>No</td>
+<td>10</td>
+</tr>
+<tr class="row-even"><td>RUN_SHIFTX</td>
+<td>(true/false) Run shiftx on every structure?</td>
+<td>No</td>
+<td>false</td>
+</tr>
+<tr class="row-odd"><td>SHIFT_EXE</td>
+<td>Path to SHIFTX executable</td>
+<td>If RUN_SHIFTX is true</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<p>An example input file can be found in <code class="code docutils literal"><span class="pre">$EISD_HOME/test/ab42_example.inp</span></code>.</p>
+</div>
+<div class="section" id="experimental-data-files">
+<h2>Experimental Data Files<a class="headerlink" href="#experimental-data-files" title="Permalink to this headline">¶</a></h2>
+<p>Experimental data files that are input into EISD must have a specific format,
+which is the same as that used in the ENSEMBLE program. The format for each
+experimental data point is described below, with examples.</p>
+<div class="section" id="chemical-shift">
+<h3>Chemical Shift<a class="headerlink" href="#chemical-shift" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre>Residue     Atom    Chemical Shift      Error
 </pre></div>
 </div>
-<p>And now we use the above to build <code class="xref py py-class docutils literal"><span class="pre">DataEISD</span></code> objects that will calculate
-probabilities:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">eisd.eisd</span> <span class="kn">import</span> <span class="n">DataEISD</span>
-
-<span class="n">shift_eisd</span> <span class="o">=</span> <span class="n">DataEISD</span><span class="p">(</span><span class="n">shift_back_calc</span><span class="p">,</span> <span class="n">shift_data</span><span class="p">)</span>
-
-<span class="c"># don&#39;t consider back-calc error for j-coupling (error is all in nuisance parameter variability):</span>
-<span class="n">jcoup_eisd</span> <span class="o">=</span> <span class="n">DataEISD</span><span class="p">(</span><span class="n">jcoup_back_calc</span><span class="p">,</span> <span class="n">jcoup_data</span><span class="p">,</span> <span class="n">no_bc_err</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</div>
+<div class="section" id="j-coupling">
+<h3>J-Coupling<a class="headerlink" href="#j-coupling" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre>Res1    Atom1   Res2    Atom2   Res3    Atom3   Res4    Atom4   J   Err_Low   Err_Up
 </pre></div>
 </div>
-<p>Now build a <a class="reference internal" href="modules.html#priors.UniformPrior" title="priors.UniformPrior"><code class="xref py py-class docutils literal"><span class="pre">priors.UniformPrior</span></code></a> object assuming there are
-10 ensembles in our hypothesis space (so the prior probability of each is 0.1):</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">eisd.priors</span> <span class="kn">import</span> <span class="n">UniformPrior</span>
-
-<span class="n">prior</span> <span class="o">=</span> <span class="n">UniformPrior</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Now we calculate and print the probability of the ensemble given the
-experimental data and prior distribution:</p>
-<div class="highlight-python"><div class="highlight"><pre>shift_logp = shift_eisd.calc_logp(structs)
-jcoup_logp = jcoup_eisd.calc_logp(structs)
-prior_logp = prior.calc_prior_logp()
-total_logp = shift_logp + jcoup_logp + prior_logp()
-
-outstr = &quot;The ensemble at %s fits chemical shift data with log probability of %.3f, &quot; \
-         &quot;J coupling data with log probability of %.3f and a conformational prior&quot; \
-          &quot;distribution with log probability %.3f&quot; The total log probability is then %.3f&quot; \
-          % (pdbdir, shift_logp, jcoup_logp, prior_logp, total_logp)
-print outstr
-</pre></div>
-</div>
-</div>
-<div class="section" id="finding-optimal-subsets">
-<h2>Finding optimal subsets<a class="headerlink" href="#finding-optimal-subsets" title="Permalink to this headline">¶</a></h2>
-<p>Due to EISD&#8217;s size extensivity, it is ideal for finding the optimal subset of
-an ensemble that maximizes the probabilities found above. This optimization
-is implemented in the using a simulated annealing to swap out structures in the subset
-with structures from the full ensemble.</p>
-<p>Below is an example showing how to perform this optimization with J-coupling
-and chemical shift experimental data and a Uniform Prior. Again, this assumes
-that SHIFTX2 has been run for every structure in the full ensemble.</p>
-<p>First define the directory where the full ensemble of structures is stored.
-This is referred to as the &#8220;reservoir&#8221; of structures. Also define the size
-of the subset that will be optimized and the number of iterations of
-simulated annealing to be performed. Additionally provide the path to a  file that will
-contain the names of the pdb files that make up the optimal ensemble, as well
-as a file for storing optimization statistics:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">pdbdir</span> <span class="o">=</span> <span class="s">&quot;$PATH_TO_ENSEMBLE_DIR$/&quot;</span>
-<span class="n">subset_size</span> <span class="o">=</span> <span class="mi">1000</span>
-<span class="n">niter</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">1e6</span><span class="p">)</span>
-
-<span class="n">savefile</span> <span class="o">=</span> <span class="s">&quot;../output/$OPT_FILE$&quot;</span>
-<span class="n">stats_file</span> <span class="o">=</span> <span class="s">&quot;../output/$STATS_FILE$&quot;</span>
-</pre></div>
-</div>
-<p>Now build a <a class="reference internal" href="modules.html#priors.BasePrior" title="priors.BasePrior"><code class="xref py py-class docutils literal"><span class="pre">priors.BasePrior</span></code></a> object and <code class="xref py py-class docutils literal"><span class="pre">eisd.DataEISD</span></code> objects
-for each set of experimental data:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">eisd.priors</span> <span class="kn">import</span> <span class="n">UniformPrior</span>
-<span class="kn">from</span> <span class="nn">eisd.eisd</span> <span class="kn">import</span> <span class="n">DataEISD</span>
-<span class="kn">from</span> <span class="nn">backcalc</span> <span class="kn">import</span> <span class="n">JCoupBackCalc</span><span class="p">,</span> <span class="n">ShiftBackCalc</span>
-<span class="kn">import</span> <span class="nn">eisd.readutil</span>
-
-<span class="n">prior</span> <span class="o">=</span> <span class="n">UniformPrior</span><span class="p">(</span><span class="n">niter</span><span class="p">)</span>  <span class="c"># assume every iterations produces a new hypothesis ensemble</span>
-
-<span class="n">jcoup_eisd</span> <span class="o">=</span> <span class="n">DataEISD</span><span class="p">(</span><span class="n">JCoupBackCalc</span><span class="p">(),</span> <span class="n">eisd</span><span class="o">.</span><span class="n">readutil</span><span class="o">.</span><span class="n">get_ab42_jcoup_data</span><span class="p">(),</span>
-                      <span class="n">no_bc_err</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="n">shift_eisd</span> <span class="o">=</span> <span class="n">DataEISD</span><span class="p">(</span><span class="n">ShiftBackCalc</span><span class="p">(),</span> <span class="n">eisd</span><span class="o">.</span><span class="n">readutil</span><span class="o">.</span><span class="n">get_ab42_shift_data</span><span class="p">())</span>
-
-<span class="c"># put eisd&#39;s together in a list:</span>
-<span class="n">data_eisds</span> <span class="o">=</span> <span class="p">[</span><span class="n">jcoup_eisd</span><span class="p">,</span> <span class="n">shift_eisd</span><span class="p">]</span>
-</pre></div>
-</div>
-<p>Now define a cooling schedule for simulated annealing. Below is the default
-schedule:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">cool_sched</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Cooling schedule</span>
-
-<span class="sd">    :param t: fraction of iterations</span>
-<span class="sd">    :return: &quot;Temperature&quot; for simulated annealing</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Now we can build the <code class="xref py py-class docutils literal"><span class="pre">eisd.EISDOPT</span></code> object and begin the optimization:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">eisd.eisd</span> <span class="kn">import</span> <span class="n">EISDOPT</span>
-
-<span class="n">optimizer</span> <span class="o">=</span> <span class="n">EISDOPT</span><span class="p">(</span><span class="n">pdbdir</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">data_eisds</span><span class="p">,</span> <span class="n">savefile</span><span class="p">,</span>
-                    <span class="n">subsize</span><span class="o">=</span><span class="n">subset_size</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
-                    <span class="n">stats_file</span><span class="o">=</span><span class="n">stats_file</span><span class="p">)</span>
-
-<span class="n">optimizer</span><span class="o">.</span><span class="n">opt</span><span class="p">(</span><span class="n">niter</span><span class="p">,</span> <span class="n">cool_sched</span><span class="o">=</span><span class="n">cool_sched</span><span class="p">)</span>
-</pre></div>
+<p>Example files can be found in <code class="code docutils literal"><span class="pre">$EISD_HOME/test/</span></code></p>
 </div>
 </div>
 </div>
@@ -279,7 +297,7 @@ schedule:</p>
         <a href="modules.html" class="btn btn-neutral float-right" title="Modules">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="intro.html" class="btn btn-neutral" title="Getting Started"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="intro.html" class="btn btn-neutral" title="Use"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -309,7 +327,7 @@ schedule:</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.1',
+            VERSION:'0.2',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

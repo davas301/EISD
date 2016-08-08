@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Modules &mdash; EISD 0.1 documentation</title>
+  <title>Modules &mdash; EISD 0.2 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="EISD 0.1 documentation" href="index.html"/>
+    <link rel="top" title="EISD 0.2 documentation" href="index.html"/>
         <link rel="next" title="References" href="references.html"/>
         <link rel="prev" title="Use" href="use.html"/> 
 
@@ -64,7 +64,12 @@
           
           
               <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="intro.html">Getting Started</a><ul>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Use</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="intro.html#input-file">Input File</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="intro.html#getting-started">Getting Started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="intro.html#introduction">Introduction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="intro.html#dependencies">Dependencies</a></li>
 <li class="toctree-l2"><a class="reference internal" href="intro.html#installation">Installation</a></li>
@@ -72,8 +77,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="use.html">Use</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="use.html#overview">Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="use.html#calculating-eisd-probabilities">Calculating EISD probabilities</a></li>
-<li class="toctree-l2"><a class="reference internal" href="use.html#finding-optimal-subsets">Finding optimal subsets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="use.html#input-file">Input File</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Modules</a><ul>
@@ -1279,6 +1283,14 @@ mean mu and stdev sig.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="util.str_to_bool">
+<code class="descclassname">util.</code><code class="descname">str_to_bool</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="headerlink" href="#util.str_to_bool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a string to a boolean.
+:param s: string to convert
+:return: boolean value of string</p>
+</dd></dl>
+
+<dl class="function">
 <dt id="util.timeit">
 <code class="descclassname">util.</code><code class="descname">timeit</code><span class="sig-paren">(</span><em>f</em><span class="sig-paren">)</span><a class="headerlink" href="#util.timeit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Timing decorator for a function f
@@ -1392,7 +1404,7 @@ mean mu and stdev sig.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.1',
+            VERSION:'0.2',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
