@@ -227,3 +227,18 @@ def calc_psrf(inseqs, rand_toss=False):
     # # return v/w
     # r = ((v / w) * df) / (df - 2)
     # return r
+
+
+def str_to_bool(s):
+    """
+    Convert a string to a boolean.
+    :param s: string to convert
+    :return: boolean value of string
+    """
+    if s.lower() in ('1', 'true', 't'):
+        return True
+    elif s.lower() in ('0', 'false', 'f'):
+        return False
+    else:
+        raise ValueError('Input string \"%s\" was not recognized as a boolean')
+

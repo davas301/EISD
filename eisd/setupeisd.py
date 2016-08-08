@@ -4,7 +4,7 @@ from backcalc import JCoupBackCalc, ShiftBackCalc
 from eisdcore import DataEISD, EISDOPT
 from priors import UniformPrior
 from readutil import read_chemshift_data, read_jcoup_data
-from util import GaussianCoolSched, LinearCoolSched
+from util import GaussianCoolSched, LinearCoolSched, str_to_bool
 
 """
 Copyright (c) 2016, Teresa Head-Gordon and David Brookes
@@ -131,9 +131,9 @@ class InputFile(object):
         # now make sure things are the correct type:
         for bool_key in ['USE_JCOUP', 'USE_SHIFT', 'RUN_SHIFTX']:
             try:
-                self.keys_[bool_key] = bool(self.keys_[bool_key])
+                self.keys_[bool_key] = str_to_bool(self.keys_[bool_key])
             except ValueError:
-                print "%s is not a valid value for %s. Must be 0 or 1" % (str(
+                print "%s is not a valid value for %s. Must be a boolean" % (str(
                     self.keys_[bool_key]), bool_key)
                 return False
 
