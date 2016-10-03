@@ -79,7 +79,7 @@ def normal_log_deriv(x, mu, sig):
     :param sig: variance
     :return: d/dx
     """
-    return (-2 * x + mu) / (2 * sig ** 2)
+    return (-2.0 * x + mu) / (2 * sig ** 2)
 
 
 def timeit(f):
@@ -242,3 +242,65 @@ def str_to_bool(s):
     else:
         raise ValueError('Input string \"%s\" was not recognized as a boolean')
 
+
+def determinant3(a):
+    """
+    Determinant of a 3x3 matrix
+    :param a: 3x3 matrix
+    :return: determinant of a
+    """
+    det = a[0, 0] * a[1, 1] * a[2, 2]
+    det += a[0, 1] * a[1, 2] * a[2, 0]
+    det += a[0, 2] * a[1, 0] * a[2, 1]
+    det -= a[0, 2] * a[1, 1] * a[2, 0]
+    det -= a[0, 1] * a[1, 0] * a[2, 2]
+    det -= a[0, 0] * a[1, 2] * a[2, 1]
+    return det
+
+
+def solve_3_eqs(a, b):
+    """
+    Solve Ax=b for a 3x3 A and a 3x1 b
+    :param a: 3x3 matrix
+    :param b: size 3 vector
+    :return: x
+    """
+    ax = np.array([
+        [b[0], a[0, 1], a[0, 2]],
+        [b[1], a[1, 1], a[1, 2]],
+        [b[2], a[2, 1], a[2, 2]]
+    ])
+
+    ay = np.array([
+        [a[0, 0], b[0], a[0, 2]],
+        [a[1, 0], b[1], a[1, 2]],
+        [a[2, 0], b[2], a[2, 2]]
+    ])
+
+    az = np.array([
+        [a[0, 0], a[0, 1], b[0]],
+        [a[1, 0], a[1, 1], b[1]],
+        [a[2, 0], a[2, 1], b[2]]
+    ])
+
+    det = determinant3(a)
+    detx = determinant3(ax)
+    dety = determinant3(ay)
+    detz = determinant3(az)
+
+    x = np.array([detx / det, dety / det, detz / det])
+    return x
+
+
+def read_pdb_list(path):
+    """
+    Reads a file containing a list of pdb files
+    :param path: path to file
+    :return: list of files
+    """
+    f = open(path)
+    pdbs = []
+    for line in f:
+        if line.strip():
+            pdbs.append(line.strip())
+    return pdbs

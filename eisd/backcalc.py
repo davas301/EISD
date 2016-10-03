@@ -1,8 +1,7 @@
 import numpy as np
 from scipy import linalg
-
 from readutil import Measurement
-from util import SHIFTX2_RMSD, normal_loglike
+from util import SHIFTX2_RMSD, normal_loglike, solve_3_eqs
 
 """
 Copyright (c) 2016, Teresa Head-Gordon and David Brookes
@@ -250,7 +249,7 @@ class JCoupBackCalc(BaseBackCalculator):
 
     def back_calc(self, xi, back_params):
         """
-        Implemenation of the Karplus equation. See BaseBackCalculator for more
+        Implementation of the Karplus equation. See BaseBackCalculator for more
         info
 
         :param xi:
@@ -267,7 +266,6 @@ class JCoupBackCalc(BaseBackCalculator):
     def get_default_struct_val(self):
         """
         Default is [pi, pi] dihedral angle. See BaseBackCalculator for more info
-
         :return:
         """
         meas = Measurement(data_id=None,
@@ -314,20 +312,20 @@ class JCoupBackCalc(BaseBackCalculator):
         a[2, 0] = (alpha2 / (n * sig_eps ** 2))
         a[2, 1] = (alpha1 / (n * sig_eps ** 2))
 
-        opt_params = linalg.solve(a, b)
+        opt_params = solve_3_eqs(a, b)
 
-        f = self.logp_params(opt_params)
         exp_err = exp_val - (opt_params[0] * alpha2 / n) - (
             opt_params[1] * alpha1 / n) - opt_params[2]
+
+        f = self.logp_params(opt_params)
         f += normal_loglike(exp_err, mu=0, sig=sig_eps)
         return opt_params, f
 
 
 class ShiftBackCalc(BaseBackCalculator):
     """
-    Back calculator for converting pdb files to chemical shifts.
-    Uses SHIFTX2 for the back-calculation, which has no nuisance
-    parameters
+    Back calculator for chemical shifts. Uses SHIFTX2 for the back-calculation,
+    which has no nuisance parameters
     """
 
     def __init__(self):

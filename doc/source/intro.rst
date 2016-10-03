@@ -1,5 +1,5 @@
 .. EISD documentation introduction file, created by
-.. include:: use.rst
+
 Getting Started
 ===============
 
@@ -58,7 +58,7 @@ EISD can now be run with the command::
 $ eisdrun.py <input_file>
 
 where :code:`<input_file>` is an EISD input file (described in detail in the
-:ref:`input-file` section)
+Use/Input File section)
 
 The EISD modules can now be imported into any local python program.
 

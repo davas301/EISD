@@ -4,7 +4,7 @@ from backcalc import JCoupBackCalc, ShiftBackCalc
 from eisdcore import DataEISD, EISDOPT
 from priors import UniformPrior
 from readutil import read_chemshift_data, read_jcoup_data
-from util import GaussianCoolSched, LinearCoolSched, str_to_bool
+from util import GaussianCoolSched, LinearCoolSched, str_to_bool, read_pdb_list
 
 """
 Copyright (c) 2016, Teresa Head-Gordon and David Brookes
@@ -52,15 +52,15 @@ class InputFile(object):
         # keywords. Required if initialized by None
         self.keys_ = {
             # General parameters:
-            'PDBDIR': None,  # directory containing pdb files
+            'PDBLIST': None,  # file containing list of pdb files
             'SUB_SIZE': None,  # size of final subset
 
             # Data parameters:
-            'USE_JCOUP': 0,  # use JCoupling data?
+            'USE_JCOUP': "0",  # use JCoupling data?
             'JCOUP_PATH': None,  # path to Jcoupling data
-            'USE_SHIFT': 0,  # use chemical shift data?
+            'USE_SHIFT': "0",  # use chemical shift data?
             'SHIFT_PATH': None,  # path to chemical shift data
-            'RUN_SHIFTX': 0,  # run shiftx on every structure?
+            'RUN_SHIFTX': "0",  # run shiftx on every structure?
             'SHIFTX_EXE': None,  # path to shiftx executable
 
             # Simulated annealing (SA) parameters
@@ -118,8 +118,8 @@ class InputFile(object):
         """
 
         # first check required inputs
-        if self.keys_['PDBDIR'] is None:
-            print "PDBDIR input is required and was not found"
+        if self.keys_['PDBLIST'] is None:
+            print "PDBLIST input is required and was not found"
             return False
         if self.keys_['SUB_SIZE'] is None:
             print "SUB_SIZE input is required and was not found"
@@ -202,7 +202,6 @@ class InputFile(object):
             print "%s is not a valid prior. Please input 'uniform' " \
                   "or ... thats it"
             return False
-
         return True
 
 
@@ -254,7 +253,7 @@ class SetupOpt(object):
         Setup the optimizer object
         :return: an EISDOPT object
         """
-        pdbdir = self.inpFile_.keys_['PDBDIR']
+        pdblist = read_pdb_list(self.inpFile_.keys_['PDBLIST'])
         subsize = self.inpFile_.keys_['SUB_SIZE']
         runshiftx = self.inpFile_.keys_['RUN_SHIFTX']
         savefile = self.inpFile_.keys_['SAVE_FILE']
@@ -269,7 +268,7 @@ class SetupOpt(object):
         else:
             cool_sched = None
 
-        optimizer = EISDOPT(pdbdir, self.prior_, self.dataEISD_, savefile,
+        optimizer = EISDOPT(pdblist, self.prior_, self.dataEISD_, savefile,
                             subsize=subsize, verbose=True, stats_file=statsfile,
                             run_shiftx=runshiftx, cool_sched=cool_sched)
         return optimizer

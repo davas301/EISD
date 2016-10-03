@@ -1,7 +1,6 @@
 # Example input file for running EISD on an AB42 ensemble
 
-PDBDIR  /Users/davidbrookes/data/pdb_J2_2
-#PDBDIR /Users/davidbrookes/misc/ab42_ens
+PDBLIST /Users/davidbrookes/Projects/eisd/test/ab42_100_pdblist.txt
 SUB_SIZE    100
 USE_JCOUP   1
 JCOUP_PATH  /Users/davidbrookes/Projects/eisd/test/ab42_jcoup.txt
@@ -13,8 +12,8 @@ COOL_T0 0.1
 COOL_SCALE  3
 PRIOR uniform
 PRIOR_UNI_M 10
-SAVE_FILE /Users/davidbrookes/Projects/eisd/test/ab42_ex_save.txt
-STATS_FILE /Users/davidbrookes/Projects/eisd/test/ab42_ex_stats.txt
+SAVE_FILE /Users/davidbrookes/Projects/eisd/test/ab42_ex_save2.txt
+STATS_FILE /Users/davidbrookes/Projects/eisd/test/ab42_ex_stats2.txt
 
 #RUN_SHIFTX  0
 #SHIFTX_EXE 'None'

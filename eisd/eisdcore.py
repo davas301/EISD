@@ -103,8 +103,7 @@ class DataEISD(object):
                     if self.dTypes_[i] == 'jcoup':
                         phi = struct_meas.val_[0]
                         self.optParams_[i][j][0] += np.cos(phi - (np.pi / 3))
-                        self.optParams_[i][j][1] += np.cos(
-                            phi - (np.pi / 3)) ** 2
+                        self.optParams_[i][j][1] += np.cos(phi - (np.pi / 3)) ** 2
                     else:
                         self.optParams_[i][j][0] += struct_meas.val_
                         self.optParams_[i][j][1] = SHIFTX2_RMSD[
@@ -158,7 +157,7 @@ class EISDOPT(object):
     Class for optimizing an ensemble based on EISD probabilities. This one
     is written to be compatible with DataEISDFast
 
-    :param pdb_dir: path to full ensemble of pdb structures
+    :param pdblist: list of all pdb files
     :param prior: a BasePrior object
     :param data_eisd: a DataEISDFast object
     :param savefile: file to save best ensemble to (list of pdb names)
@@ -169,12 +168,11 @@ class EISDOPT(object):
     :param run_shiftx: run SHIFTX on every built structure
     """
 
-    def __init__(self, pdb_dir, prior, data_eisd, savefile, subsize=1000,
+    def __init__(self, pdblist, prior, data_eisd, savefile, subsize=1000,
                  verbose=True, stats_file=None, restartfile=None,
                  cool_sched=None, run_shiftx=False):
-        self.pdbDir_ = pdb_dir
-        self.allPDB_ = [f for f in os.listdir(self.pdbDir_) if
-                        ".pdb" in f and ".cs" not in f]
+        # self.pdbDir_ = pdb_dir
+        self.allPDB_ = pdblist
 
         if cool_sched is None:
             cool_sched = GaussianCoolSched(1, 2)
@@ -216,12 +214,10 @@ class EISDOPT(object):
         for i in range(len(state_files)):
             f = state_files[i]
             if self.runShiftx_:
-                state_structs[i] = Structure(os.path.join(self.pdbDir_, f),
-                                             runshiftx=True)
+                state_structs[i] = Structure(f, runshiftx=True)
             else:
-                shiftx_file = os.path.join(self.pdbDir_, f + ".cs")
-                state_structs[i] = Structure(os.path.join(self.pdbDir_, f),
-                                             shiftxfile=shiftx_file)
+                shiftx_file = f + ".cs"
+                state_structs[i] = Structure(f, shiftxfile=shiftx_file)
             if self.verbose_:
                 if i % 100 == 0 and i > 0:
                     print "Number of structures built: %i / % i" % (
@@ -244,10 +240,9 @@ class EISDOPT(object):
         while rand_add_file in self.stateFiles_:
             rand_add_file = np.random.choice(self.allPDB_)
 
-        rand_cs_file = os.path.join(self.pdbDir_, rand_add_file + ".cs")
+        rand_cs_file = rand_add_file + ".cs"
 
-        rand_add_struct = Structure(os.path.join(self.pdbDir_, rand_add_file),
-                                    shiftxfile=rand_cs_file)
+        rand_add_struct = Structure(rand_add_file, shiftxfile=rand_cs_file)
 
         self.stateFiles_.append(rand_add_file)
         self.stateStructs_.append(rand_add_struct)
