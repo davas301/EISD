@@ -1,8 +1,6 @@
 import os
 import time
-
 import numpy as np
-
 from backcalc import JCoupBackCalc
 from eisdstructure import Structure
 from readutil import read_opt_out_file
@@ -57,7 +55,7 @@ class DataEISD(object):
 
         self.Nbc_ = len(back_calcs)
         self.N_ = 0
-        self.dTypes_ = []
+        self.dTypes_ = [bc.dtype_ for bc in back_calcs]
         self.backCalcs_ = back_calcs
         self.M_ = [0] * self.Nbc_
         self.expKeys_ = [None] * self.Nbc_
@@ -67,11 +65,6 @@ class DataEISD(object):
         self.optParams_ = [None] * self.Nbc_
 
         for i in range(self.Nbc_):
-            if isinstance(back_calcs[i], JCoupBackCalc):
-                self.dTypes_.append("jcoup")
-            else:
-                self.dTypes_.append("shift")
-
             self.M_[i] = len(exp_datas[i])
             self.expKeys_[i] = []
             self.D_[i] = []
@@ -83,11 +76,10 @@ class DataEISD(object):
                 self.D_[i].append(float(val[0]))
                 self.expSigs_[i].append(float(val[1]))
                 self.bcSigs_[i].append(self.backCalcs_[i].get_err_sig(did))
-                if self.dTypes_[i] == "shift":
-                    # first value is beta (sum over back-calculations and
-                    # second value is std of back calc error for that atom
-                    self.optParams_[i].append([0, 0])
-                else:
+                if self.dTypes_[i] in ["shift", "jcoup", "rdc", "rh", "saxs"]:
+                    # Each of these has two structural parameters. Jcoup is
+                    # (sum of cosines, sum of cosines**2). Shift, rdc, and rh have
+                    # (sum of predictions, std of prediction)
                     self.optParams_[i].append([0, 0])
 
     def set_struct_vals(self, structs):
@@ -104,10 +96,9 @@ class DataEISD(object):
                         phi = struct_meas.val_[0]
                         self.optParams_[i][j][0] += np.cos(phi - (np.pi / 3))
                         self.optParams_[i][j][1] += np.cos(phi - (np.pi / 3)) ** 2
-                    else:
+                    if self.dTypes_[i] in ["shift", "rdc", "rh", "saxs"]:
                         self.optParams_[i][j][0] += struct_meas.val_
-                        self.optParams_[i][j][1] = SHIFTX2_RMSD[
-                            struct_meas.dataID_.atom_]
+                        self.optParams_[i][j][1] = self.backCalcs_[i].get_err_sig(struct_meas.dataID_)
 
     def update_struct_vals(self, removed, added):
         """
@@ -129,9 +120,44 @@ class DataEISD(object):
                     self.optParams_[i][j][0] += np.cos(add_phi - (np.pi / 3))
                     self.optParams_[i][j][1] += np.cos(
                         add_phi - (np.pi / 3)) ** 2
-                else:
+                if self.dTypes_[i] in ["shift", "rdc", "rh", "saxs"]:
                     self.optParams_[i][j][0] -= rem_meas.val_
                     self.optParams_[i][j][0] += add_meas.val_
+
+    def add_struct_vals(self, added):
+        """
+        Update optParams for an added structure only
+        :param added: an added Structure object
+        """
+        for i in range(self.Nbc_):
+            for j in range(self.M_[i]):
+                add_meas = added.get_struct_measure(self.expKeys_[i][j])
+                if self.dTypes_[i] == 'jcoup':
+                    add_phi = add_meas.val_[0]
+                    self.optParams_[i][j][0] += np.cos(add_phi - (np.pi / 3))
+                    self.optParams_[i][j][1] += np.cos(
+                        add_phi - (np.pi / 3)) ** 2
+                if self.dTypes_[i] in ["shift", "rdc", "rh", "saxs"]:
+                    self.optParams_[i][j][0] += add_meas.val_
+
+    def get_logp_for_measures(self):
+        """
+        Return the log probabilities of each measurement in a dictionary
+        :return: [{exp_key: probability} dict for each back calc type]
+        """
+        logp_totals = []
+        for i in range(self.Nbc_):
+            logp_totals.append({})
+            for j in range(self.M_[i]):
+                inlist = [self.N_, self.optParams_[i][j], self.expSigs_[i][j],
+                          self.D_[i][j]]
+
+                opt_params, f = self.backCalcs_[i].calc_opt_params(*inlist)
+                logp_opt_j = f
+
+                exp_key = self.expKeys_[i][j]
+                logp_totals[i][exp_key] = logp_opt_j
+        return logp_totals
 
     def calc_logp(self):
         """
@@ -148,6 +174,7 @@ class DataEISD(object):
                 opt_params, f = self.backCalcs_[i].calc_opt_params(*inlist)
 
                 logp_opt_j = f
+
                 logp_totals[i] += logp_opt_j
         return logp_totals
 

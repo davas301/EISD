@@ -3,7 +3,6 @@ import os
 import subprocess
 import sys
 import time
-
 import numpy as np
 
 """
@@ -50,6 +49,9 @@ class BaseDataID(object):
     measurements. These IDs must be hashable and have equality comparisons
     """
 
+    def __init__(self, dtype):
+        self.dtype_ = dtype
+
     def __hash__(self):
         raise NotImplementedError
 
@@ -72,6 +74,7 @@ class ShiftID(BaseDataID):
     def __init__(self, res_num, atom_name):
         self.res_ = res_num
         self.atom_ = atom_name
+        super(ShiftID, self).__init__("shift")
 
     def __hash__(self):
         """
@@ -99,6 +102,7 @@ class JCoupID(BaseDataID):
 
     def __init__(self, res_num):
         self.res_ = res_num
+        super(JCoupID, self).__init__("jcoup")
 
     def __hash__(self):
         return hash(self.res_)
@@ -114,6 +118,81 @@ class JCoupID(BaseDataID):
         return s
 
 
+class RDCID(BaseDataID):
+    """
+    ID objects for RDC values. Only requires a residue number (assumes they are
+    intra-residue H-N RDCs)
+
+    :param res_num: residue number of measurement
+    """
+
+    def __init__(self, res_num):
+        self.res_ = res_num
+        super(RDCID, self).__init__("rdc")
+
+    def __hash__(self):
+        return hash(self.res_)
+
+    def __eq__(self, other):
+        if other.res_ == self.res_:
+            return True
+        else:
+            return False
+
+    def __str__(self):
+        s = "%i" % self.res_
+        return s
+
+
+class RHID(BaseDataID):
+    """
+    ID objects for hydrodynamic radius values. There is only one
+    hydrodynamic radius for a structure, so this does not require
+    any parameters, but it can have an optional name
+    """
+
+    def __init__(self, name="rh"):
+        self.name_ = name
+        super(RHID, self).__init__("rh")
+
+    def __hash__(self):
+        return hash(self.name_)
+
+    def __eq__(self, other):
+        if other.name_ == self.name_:
+            return True
+        else:
+            return False
+
+    def __str__(self):
+        s = "%s" % self.name_
+        return s
+
+
+class SAXSID(BaseDataID):
+    """
+    ID objects for SAXS back-calc values. Requires the
+    radius defining the SAXS value
+    """
+
+    def __init__(self, radius):
+        self.radius_ = radius
+        super(SAXSID, self).__init__("saxs")
+
+    def __hash__(self):
+        return hash(self.radius_)
+
+    def __eq__(self, other):
+        if other.intensity_ == self.radius_:
+            return True
+        else:
+            return False
+
+    def __str__(self):
+        s = "%f" % self.radius_
+        return s
+
+
 class Measurement(object):
     """
     Class for storing all of the info in a data measurement
@@ -126,6 +205,60 @@ class Measurement(object):
     def __init__(self, data_id=None, val=None):
         self.dataID_ = data_id
         self.val_ = val
+
+
+class RunCRYSOL(object):
+    """
+    Class for running the SAXS back-calculator used by ENSEMBLE, CRYSOL.
+    """
+
+    def __init__(self):
+        pass
+
+    def run(self, pdb_path):
+        """
+        Run the program
+        :param pdb_path: path of file to run predictor on
+        :return: path to output file
+        """
+        return ""
+
+    @staticmethod
+    def read_output(path):
+        """
+        Read the output from the predictor
+        :param path: path to output file
+        :return: {RDCID: prediction} dict
+        """
+        return {SAXSID(0.00): 0.0}  # placeholder
+
+
+class RunRDCCalculator(object):
+    """
+    Class for running the RDC back-calculator used by ENSEMBLE. I don't
+    actually know how it is done, so this class is mostly empty, but
+    has the structure we would need.
+    """
+
+    def __init__(self):
+        pass
+
+    def run(self, pdb_path):
+        """
+        Run the program
+        :param pdb_path: path of file to run predictor on
+        :return: path to output file
+        """
+        return ""
+
+    @staticmethod
+    def read_output(path):
+        """
+        Read the output from the predictor
+        :param path: path to output file
+        :return: {RDCID: prediction} dict
+        """
+        return {RDCID(0): 0.0}  # placeholder
 
 
 class RunShiftX(object):
@@ -273,7 +406,7 @@ def get_ab42_jcoup_data():
     """
     Read the J-coupling data for aB42 in ../test_data/
 
-    :return: a {JCoupID: val} dict
+    :return: a {JCoupID: (val, err)} dict
     """
     jcoup_data_path = "../test/bax_2016_jcoup.txt"
     jcoup_data = {}
@@ -321,7 +454,7 @@ def read_jcoup_data(path):
     Where the last lines are standard deviations.
     Currently the only usable type is 3JHNHA coupling data.
     :param path: path to data file
-    :return: a {JCoupID: val} dict
+    :return: a {JCoupID: (val, err)} dict
     """
     jcoup_data = {}
     expj = open(path)
@@ -345,6 +478,69 @@ def read_jcoup_data(path):
             jcoup_data[jid] = (val, err)
     expj.close()
     return jcoup_data
+
+
+def read_rdc_data(path):
+    """
+    Read a file of experimental RDC data. Must be in ENSEMBLE format:
+
+    res1 atom1 res2 atom2 atom4 RDC
+
+    Currently the only usable type intra-residue H-N data
+    :param path: path to data file
+    :return: a {RDCID: (val, err)} dict
+    """
+    rdc_data = {}
+    expr = open(path)
+    for line in expr:
+        split = line.split()
+        if len(split) < 5 or line.startswith('#'):
+            continue
+        else:
+            try:
+                res_num = int(split[0])
+                val = float(split[4])
+                err = float(split[5])
+            except ValueError:
+                print "RDC data not formatted properly. Please format " \
+                      "as:\n res1 atom1 res2 atom2 RDC err"
+                print "Aborting program."
+                sys.exit()
+
+            rid = JCoupID(res_num)
+            rdc_data[rid] = (val, err)
+    expr.close()
+    return rdc_data
+
+
+def read_saxs_data(path):
+    """
+    Read a file of experimental SAXS data. Must be in ENSEMBLE format:
+    radius  intensity   error   Asym
+    :param path: path to data file
+    :return: {SAXSID: (val, err)} dictionary
+    """
+    saxs_data = {}
+    exps = open(path)
+    for line in exps:
+        split = line.split()
+        if len(split) < 3 or line.startswith('#'):
+            continue
+        else:
+            try:
+                rad = int(split[0])
+                intensity = float(split[1])
+                err = float(split[2])
+            except ValueError:
+                print "SAXS data not formatted properly. Please format " \
+                      "as:\n radius  intensity   error   Asym"
+                print "Aborting program."
+                sys.exit()
+
+            sid = SAXSID(rad)
+            saxs_data[sid] = (intensity, err)
+    exps.close()
+    return saxs_data
 
 
 def read_chemshift_data(path):

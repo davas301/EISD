@@ -1,7 +1,6 @@
 import Bio.PDB
-
-from readutil import RunShiftX, Measurement
-from readutil import ShiftID
+from readutil import RunShiftX, Measurement, RunRDCCalculator, RunCRYSOL
+from readutil import ShiftID, RDCID, RHID, SAXSID
 
 """
 Copyright (c) 2016, Teresa Head-Gordon and David Brookes
@@ -43,14 +42,19 @@ class Structure(object):
     Class for representing and modifying protein structures. Interfaces
     significantly with MMTK.
 
-    :param pdbfile: path to the pdbfile containing the representation of this
-                    structure
-    :param shiftxfile: file containing back-calculated SHIFTX2 data for this
-                       structure
+    :param pdbfile: path to the pdbfile containing the representation of this structure
+    :param shiftxfile: file containing back-calculated SHIFTX2 data for this structure
     :param runshiftx: an optional RunShiftX instance
+    :param rdcfile: otpional file containing back-calculated RDC data for this structure
+    :param runrdccalc: an optional RunRDCCalculator instance
+    :param rh_val: an optional back-calculated tuple for hydrodynamic radius and error
+    :param saxsfile: otpional file containing back-calculated SAXS data for this structure
+    :param run_crysol: an option RunCRYSOL instance
     """
 
-    def __init__(self, pdbfile, shiftxfile=None, runshiftx=None, energy=None):
+    def __init__(self, pdbfile, shiftxfile=None, runshiftx=None,
+                 rdcfile=None, runrdccalc=None, rh_val=None,
+                 saxsfile=None, run_crysol=None):
         self.pdb_ = pdbfile.split('/')[-1]  # only want the name of the pdb
 
         parser = Bio.PDB.PDBParser()
@@ -58,6 +62,7 @@ class Structure(object):
         chain = struct.get_chains().next()
         self.protein_ = Bio.PDB.Polypeptide.Polypeptide(chain)
 
+        # check for SHIFTX data
         if shiftxfile is not None:
             self.shiftxdata_ = RunShiftX.read_ouput(shiftxfile)
         elif runshiftx is not None:
@@ -66,7 +71,28 @@ class Structure(object):
         else:
             self.shiftxdata_ = None
 
-        self.energy_ = energy
+        # check for RDC back-calculated data:
+        if rdcfile is not None:
+            self.rdcData_ = RunRDCCalculator.read_output(rdcfile)
+        elif runrdccalc is not None:
+            rdcfile = runrdccalc.run(self.pdb_)
+            self.rdcData_ = RunRDCCalculator.read_output(rdcfile)
+        else:
+            self.rdcData_ = None
+
+        # check for RDC back-calculated data:
+        if saxsfile is not None:
+            self.saxsData_ = RunCRYSOL.read_output(saxsfile)
+        elif run_crysol is not None:
+            saxsfile = run_crysol.run(self.pdb_)
+            self.saxsData_ = RunCRYSOL.read_output(saxsfile)
+        else:
+            self.saxsData_ = None
+
+        # check if there is a back-calculated RH value
+        if rh_val is not None:
+            self.rhVal_ = rh_val
+
         self.dihed_ = self._get_all_dihed()
 
     def _get_all_dihed(self):
@@ -87,12 +113,21 @@ class Structure(object):
         experimental measurement. This structural measurement can be
         input into a back-calculator
 
-        :param exp_id: An experimental data ID (ShiftID or JCoupID)
+        :param exp_id: An experimental data ID
         """
-        if isinstance(exp_id, ShiftID):
+        if exp_id.dtype_ == "shift":
             struct_meas = Measurement(data_id=exp_id,
                                       val=self.shiftxdata_[exp_id])
-        else:
+        elif exp_id.dtype_ == "rdc":
+            struct_meas = Measurement(data_id=exp_id,
+                                      val=self.rdcData_[exp_id])
+        elif exp_id.dtype_ == "rh":
+            struct_meas = Measurement(data_id=exp_id,
+                                      val=self.rhVal_)
+        elif exp_id.dtype_ == "saxs":
+            struct_meas = Measurement(data_id=exp_id,
+                                      val=self.saxsData_[exp_id])
+        else:  # dtype==jcoup
             struct_meas = Measurement(data_id=exp_id,
                                       val=self.dihed_[exp_id.res_])
         return struct_meas

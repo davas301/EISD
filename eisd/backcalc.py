@@ -1,5 +1,4 @@
 import numpy as np
-from scipy import linalg
 from readutil import Measurement
 from util import SHIFTX2_RMSD, normal_loglike, solve_3_eqs
 
@@ -43,9 +42,11 @@ class BaseBackCalculator(object):
     Abstract base class for back calculators
 
     :param nparams: number of nuisance parameters
+    :param dtype: name of the data this back-calculator concerns (e.g. "shift" or "jcoup)
     """
 
-    def __init__(self, nparams):
+    def __init__(self, nparams, dtype):
+        self.dtype_ = dtype
         self.nParams_ = nparams
 
     def get_err_sig(self, data_id):
@@ -173,7 +174,7 @@ class JCoupBackCalc(BaseBackCalculator):
         self.errMu_ = err_mu
         self.errSig_ = err_sig
 
-        super(JCoupBackCalc, self).__init__(nparams=3)
+        super(JCoupBackCalc, self).__init__(nparams=3, dtype="jcoup")
 
     def get_err_sig(self, data_id=None):
         """
@@ -322,14 +323,13 @@ class JCoupBackCalc(BaseBackCalculator):
         return opt_params, f
 
 
-class ShiftBackCalc(BaseBackCalculator):
+class BlackBoxBackCalc(BaseBackCalculator):
     """
-    Back calculator for chemical shifts. Uses SHIFTX2 for the back-calculation,
-    which has no nuisance parameters
+    Base class for any black box back calculator in the EISD scheme
     """
 
-    def __init__(self):
-        super(ShiftBackCalc, self).__init__(nparams=0)
+    def __init__(self, dtype):
+        super(BlackBoxBackCalc, self).__init__(nparams=0, dtype=dtype)
 
     def get_default_params(self):
         """
@@ -352,7 +352,7 @@ class ShiftBackCalc(BaseBackCalculator):
     def get_random_err(self, data_id):
         """
         Return a random value from the normal distribution corresponding
-        to the SHIFTX2 rmsd value for this data id. See BaseBackCalculator
+        to the error std value for this data id. See BaseBackCalculator
         for more info
 
         :param data_id:
@@ -363,14 +363,13 @@ class ShiftBackCalc(BaseBackCalculator):
 
     def get_err_sig(self, data_id):
         """
-        Get the std corresponding to the SHIFTX2 rmsd for this data id
+        Get the std of error corresponding to this data id. See
+        BaseBackCalculator for more info
 
         :param data_id:
         :return:
         """
-        atom = data_id.atom_
-        sig_err = SHIFTX2_RMSD[atom]
-        return sig_err
+        raise NotImplementedError
 
     def logp_params(self, params=None):
         """
@@ -393,28 +392,27 @@ class ShiftBackCalc(BaseBackCalculator):
 
     def logp_err(self, err, data_id):
         """
-        Error represented as gaussian with std based on SHIFTX2 reported rmsd
+        Error represented as gaussian with std from get_err_sig
         See BaseBackCalculator for more info
 
         :param err:
         :param data_id:
         :return:
         """
-        atom = data_id.atom_
-        sig_err = SHIFTX2_RMSD[atom]
+        sig_err = self.get_err_sig(data_id)
         logp = normal_loglike(err, mu=0, sig=sig_err)
         return logp
 
     def back_calc(self, xi, params=None):
         """
-        In this case, xi contains the back-calculated measurement.
-        See BaseBackCalculator for more info.
+        this must be implemented for any new method based on the
+        DataID structure for that back-calculator
 
         :param xi:
         :param params:
         :return:
         """
-        return xi.val_
+        raise NotImplementedError
 
     def get_default_struct_val(self):
         """
@@ -445,3 +443,122 @@ class ShiftBackCalc(BaseBackCalculator):
         exp_err = beta - exp_val - eps_back_opt
         f += normal_loglike(exp_err, mu=0, sig=sig_eps)
         return [eps_back_opt], f
+
+
+class ShiftBackCalc(BlackBoxBackCalc):
+    """
+    Back calculator for chemical shifts. Uses SHIFTX2 for the back-calculation,
+    which has no nuisance parameters.
+    """
+
+    def __init__(self):
+        super(ShiftBackCalc, self).__init__("shift")
+
+    def get_err_sig(self, data_id):
+        """
+        Get the std corresponding to the SHIFTX2 rmsd for this data id
+
+        :param data_id:
+        :return:
+        """
+        atom = data_id.atom_
+        sig_err = SHIFTX2_RMSD[atom]
+        return sig_err
+
+    def back_calc(self, xi, params=None):
+        """
+        In this case, xi contains the back-calculated measurement.
+        See BaseBackCalculator for more info.
+
+        :param xi:
+        :param params:
+        :return:
+        """
+        return xi.val_
+
+
+class RDCBackCalc(BlackBoxBackCalc):
+    """
+    Back calculator for residual dipolar couplings. Assumes that an RDC back-calculator
+    has been run and read in by Structure (same as it is done for ShiftBackCalc
+    :param err_std: I don't know the std of error for these, so it must be input for now
+    """
+
+    def __init__(self, err_std):
+        self.errSig_ = err_std
+        super(RDCBackCalc, self).__init__("rdc")
+
+    def get_err_sig(self, data_id):
+        """
+        For now, return the member self.errSig_
+        :param data_id:
+        :return:
+        """
+        return self.errSig_
+
+    def back_calc(self, xi, params=None):
+        """
+        xi should contain the back-calculated value in xi.val_
+        :param xi:
+        :param params:
+        :return:
+        """
+        return xi.val_
+
+
+class RHBackCalc(BlackBoxBackCalc):
+    """
+    Back calculator for hydrodynamic radius. HYDROPRO should have been run before
+    and the results should be stored in Structure. I don't know the std of error
+    for these, so it must be input for now
+    """
+
+    def __init__(self, err_std):
+        self.errSig_ = err_std
+        super(RHBackCalc, self).__init__("rh")
+
+    def get_err_sig(self, data_id):
+        """
+        For now, return the member self.errSig_
+        :param data_id:
+        :return:
+        """
+        return self.errSig_
+
+    def back_calc(self, xi, params=None):
+        """
+        xi should contain the back-calculated value in xi.val_
+        :param xi:
+        :param params:
+        :return:
+        """
+        return xi.val_
+
+
+class SAXSBackCalc(BlackBoxBackCalc):
+    """
+    Back calculator for SAXS data. CRYSOL should have already been run
+    and the results should be stored in Structure. I don't know the std
+    of those, so it must be input for now
+    """
+
+    def __init__(self, err_std):
+        self.errSig_ = err_std
+        super(SAXSBackCalc, self).__init__("saxs")
+
+    def get_err_sig(self, data_id):
+        """
+        For now, return the member self.errSig_
+        :param data_id:
+        :return:
+        """
+        return self.errSig_
+
+    def back_calc(self, xi, params=None):
+        """
+        xi should contain the back-calculated value in xi.val_
+        :param xi:
+        :param params:
+        :return:
+        """
+        return xi.val_
