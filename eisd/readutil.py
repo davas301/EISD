@@ -193,6 +193,124 @@ class SAXSID(BaseDataID):
         return s
 
 
+class NOEID(BaseDataID):
+    """
+    ID objects for NOE back-calc values. NOE values are calculated between
+    two atoms, so this requires residue of first atom, first atom name,
+    residue of second atom and second atom name
+    :param res1: residue of first atom
+    :param at1: first atom name
+    :param res2: residue of second atom
+    :param at2: second atom name
+    """
+
+    def __init__(self, res1, at1, res2, at2):
+        self.res1_ = res1
+        self.res2_ = res2
+        self.at1_ = at1
+        self.at2_ = at2
+        super(NOEID, self).__init__("noe")
+
+    def __hash__(self):
+        return hash((self.res1_, self.at1_, self.res2_, self.at2_))
+
+    def __eq__(self, other):
+        if self.res1_ == other.res1_ and self.res2_ == other.res2_ \
+                and self.at1_ == other.at1_ and self.at2_ == other.at2_:
+            return True
+        else:
+            return False
+
+    def __str__(self):
+        s = "%i\t%s\t%i\t%s" % (self.res1_, self.at1_, self.res2_, self.at2_)
+        return s
+
+class PREID(BaseDataID):
+    """
+    ID objects for PRE back-calc values. PRE values are calculated between
+    two atoms, so this requires residue of first atom, first atom name,
+    residue of second atom and second atom name
+    :param res1: residue of first atom
+    :param at1: first atom name
+    :param res2: residue of second atom
+    :param at2: second atom name
+    """
+
+    def __init__(self, res1, at1, res2, at2):
+        self.res1_ = res1
+        self.res2_ = res2
+        self.at1_ = at1
+        self.at2_ = at2
+        super(PREID, self).__init__("pre")
+
+    def __hash__(self):
+        return hash((self.res1_, self.at1_, self.res2_, self.at2_))
+
+    def __eq__(self, other):
+        if self.res1_ == other.res1_ and self.res2_ == other.res2_ \
+                and self.at1_ == other.at1_ and self.at2_ == other.at2_:
+            return True
+        else:
+            return False
+
+    def __str__(self):
+        s = "%i\t%s\t%i\t%s" % (self.res1_, self.at1_, self.res2_, self.at2_)
+        return s
+
+class rPREID(BaseDataID):
+    """
+    ID object for rPRE back-calc values. Requires residue and atom
+    """
+
+    def __init__(self, res_num, atom_name):
+        self.res_ = res_num
+        self.atom_ = atom_name
+        super(rPREID, self).__init__("rpre")
+
+    def __hash__(self):
+        """
+        Hash the tuple of the two members
+        """
+        return hash((self.res_, self.atom_))
+
+    def __eq__(self, other):
+        if other.res_ == self.res_ and other.atom_ == self.atom_:
+            return True
+        else:
+            return False
+
+    def __str__(self):
+        s = "%i\t%s" % (self.res_, self.atom_)
+        return s
+
+
+class R2ID(BaseDataID):
+    """
+    ID object for R2 back-calc values. Requires residue and atom
+    """
+
+    def __init__(self, res_num, atom_name):
+        self.res_ = res_num
+        self.atom_ = atom_name
+        super(R2ID, self).__init__("r2")
+
+    def __hash__(self):
+        """
+        Hash the tuple of the two members
+        """
+        return hash((self.res_, self.atom_))
+
+    def __eq__(self, other):
+        if other.res_ == self.res_ and other.atom_ == self.atom_:
+            return True
+        else:
+            return False
+
+    def __str__(self):
+        s = "%i\t%s" % (self.res_, self.atom_)
+        return s
+
+
 class Measurement(object):
     """
     Class for storing all of the info in a data measurement
@@ -221,6 +339,7 @@ class RunCRYSOL(object):
         :param pdb_path: path of file to run predictor on
         :return: path to output file
         """
+        # TODO implement this method
         return ""
 
     @staticmethod
@@ -230,6 +349,7 @@ class RunCRYSOL(object):
         :param path: path to output file
         :return: {RDCID: prediction} dict
         """
+        # TODO implement this method
         return {SAXSID(0.00): 0.0}  # placeholder
 
 
@@ -249,6 +369,7 @@ class RunRDCCalculator(object):
         :param pdb_path: path of file to run predictor on
         :return: path to output file
         """
+        # TODO implement this method
         return ""
 
     @staticmethod
@@ -258,6 +379,7 @@ class RunRDCCalculator(object):
         :param path: path to output file
         :return: {RDCID: prediction} dict
         """
+        # TODO implement this method
         return {RDCID(0): 0.0}  # placeholder
 
 
