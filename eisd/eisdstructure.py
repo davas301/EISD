@@ -1,6 +1,6 @@
 import Bio.PDB
 from readutil import RunShiftX, Measurement, RunRDCCalculator, RunCRYSOL
-from readutil import ShiftID, RDCID, RHID, SAXSID
+import numpy as np
 
 """
 Copyright (c) 2016, Teresa Head-Gordon and David Brookes
@@ -107,6 +107,21 @@ class Structure(object):
             all_dihed[i + 1] = phi_psi[i]
         return all_dihed
 
+    def _calc_dist(self, res1, at1, res2, at2):
+        """
+        Calculate distance between two atoms
+        :param res1: residue of first atom
+        :param at1: name of first atom
+        :param res2: residue of second atom
+        :param at2: name of second atom
+        :return: distance
+        """
+        p1 = self.protein_[res1][at1].get_coord()
+        p2 = self.protein_[res2][at2].get_coord()
+        r12 = p1 - p2
+        d12 = np.linalg.norm(r12)
+        return d12
+
     def get_struct_measure(self, exp_id):
         """
         Get a structural measurement from a DataID corresponding to an
@@ -127,6 +142,14 @@ class Structure(object):
         elif exp_id.dtype_ == "saxs":
             struct_meas = Measurement(data_id=exp_id,
                                       val=self.saxsData_[exp_id])
+        elif exp_id.dtype_ == "noe":
+            # returns the average distance between all possible pairs of atoms
+            dsum = 0
+            num = len(exp_id.res1_)
+            for i in range(num):
+                dsum += self._calc_dist(exp_id.res1_[i], exp_id.at1_[i],
+                                        exp_id.res2_[i], exp_id.at2_[i])
+            struct_meas = Measurement(data_id=exp_id, val=dsum / num)
         else:  # dtype==jcoup
             struct_meas = Measurement(data_id=exp_id,
                                       val=self.dihed_[exp_id.res_])

@@ -81,6 +81,9 @@ class DataEISD(object):
                     # (sum of cosines, sum of cosines**2). Shift, rdc, and rh have
                     # (sum of predictions, std of prediction)
                     self.optParams_[i].append([0, 0])
+                elif self.dTypes_[i] in ["noe"]:
+                    # just one structural parameter (sum of distances)
+                    self.optParams_[i].append([0])
 
     def set_struct_vals(self, structs):
         """
@@ -96,9 +99,11 @@ class DataEISD(object):
                         phi = struct_meas.val_[0]
                         self.optParams_[i][j][0] += np.cos(phi - (np.pi / 3))
                         self.optParams_[i][j][1] += np.cos(phi - (np.pi / 3)) ** 2
-                    if self.dTypes_[i] in ["shift", "rdc", "rh", "saxs"]:
+                    elif self.dTypes_[i] in ["shift", "rdc", "rh", "saxs"]:
                         self.optParams_[i][j][0] += struct_meas.val_
                         self.optParams_[i][j][1] = self.backCalcs_[i].get_err_sig(struct_meas.dataID_)
+                    elif self.dTypes_[i] in ["noe"]:
+                        self.optParams_[i][j][0] += struct_meas.val_
 
     def update_struct_vals(self, removed, added):
         """
@@ -120,7 +125,7 @@ class DataEISD(object):
                     self.optParams_[i][j][0] += np.cos(add_phi - (np.pi / 3))
                     self.optParams_[i][j][1] += np.cos(
                         add_phi - (np.pi / 3)) ** 2
-                if self.dTypes_[i] in ["shift", "rdc", "rh", "saxs"]:
+                if self.dTypes_[i] in ["shift", "rdc", "rh", "saxs", "noe"]:
                     self.optParams_[i][j][0] -= rem_meas.val_
                     self.optParams_[i][j][0] += add_meas.val_
 
@@ -137,7 +142,7 @@ class DataEISD(object):
                     self.optParams_[i][j][0] += np.cos(add_phi - (np.pi / 3))
                     self.optParams_[i][j][1] += np.cos(
                         add_phi - (np.pi / 3)) ** 2
-                if self.dTypes_[i] in ["shift", "rdc", "rh", "saxs"]:
+                if self.dTypes_[i] in ["shift", "rdc", "rh", "saxs", "noe"]:
                     self.optParams_[i][j][0] += add_meas.val_
 
     def get_logp_for_measures(self):

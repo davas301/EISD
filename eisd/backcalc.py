@@ -562,3 +562,134 @@ class SAXSBackCalc(BlackBoxBackCalc):
         :return:
         """
         return xi.val_
+
+
+class NOEBackCalc(BaseBackCalculator):
+    """
+    Back calculator for NOE restraints. This uses the isolated spin pair
+    approximation, with parameter gamma
+        NOE = gamma * r ^ -6
+    where r is the distance between two atoms
+    :param gamma_mu: mean of gamma parameter distribution
+    :param gamma_std: std of gamma parameter distribtuion
+    :param err_sig: std of errors (default is 0, b/c error should be
+                    encapsulated by gamma distribution)
+    """
+
+    def __init__(self, gamma_mu, gamma_std, err_sig=0):
+        self.gmu_ = gamma_mu
+        self.gstd_ = gamma_std
+        self.errSig_ = err_sig
+        super(NOEBackCalc, self).__init__(1, "noe")
+
+    def get_err_sig(self, data_id=None):
+        """
+        See BaseBackCalculator for more info
+
+        :param data_id:
+        :return:
+        """
+        return self.errSig_
+
+    def get_random_params(self):
+        """
+        See BaseBackCalculator for more info
+
+        :return:
+        """
+        params = [np.random.normal(loc=self.gmu_, scale=self.gstd_)]
+        return params
+
+    def logp_params(self, params):
+        """
+        Parameters are represented as normals. See BaseBackCalculator for more
+        info
+
+        :param params:
+        :return:
+        """
+        logp = normal_loglike(params[0], mu=self.gmu_, sig=self.gstd_)
+        return logp
+
+    def get_random_err(self, data_id=None):
+        """
+        data_id is optional for this back-calculator. See BaseBackCalculator for
+        more info
+
+        :param data_id:
+        """
+        return np.random.normal(loc=0, scale=self.errSig_)
+
+    def get_default_params(self):
+        """
+        Return mean of param values. See BaseBackCalculator for more info
+
+        :return:
+        """
+        return [self.gmu_]
+
+    def get_default_err(self, data_id=None):
+        """
+        Default if mean of error distribution See BaseBackCalculator for more
+        info
+
+        :param data_id:
+        :return:
+        """
+        return 0
+
+    def logp_err(self, err, data_id=None):
+        """
+        Error is represemted as a normal. See BaseBackCalculator for more info
+
+        :param err:
+        :param data_id:
+        """
+        logp = normal_loglike(err, mu=0, sig=self.errSig_)
+        return logp
+
+    def back_calc(self, xi, back_params):
+        """
+        Implementation of the ISPA equation. See BaseBackCalculator for more
+        info
+
+        :param xi:
+        :param back_params:
+        """
+        r = xi.val_
+        gamma = back_params[0]
+        n = gamma * (r ** (-6))
+        return n
+
+    def get_default_struct_val(self):
+        """
+        Default is [pi, pi] dihedral angle. See BaseBackCalculator for more info
+        :return:
+        """
+        meas = Measurement(data_id=None,
+                           val=1)
+        return meas
+
+    def calc_opt_params(self, n, alpha, sig_eps, exp_val):
+        """
+        Analytically calculate the optimal gamma value
+        For more info see BaseBackCalculator
+        :param n: number of structures
+        :param alpha: pre-calculated sum of r^-6 values
+        :param sig_eps: experimental error
+        :param exp_val: experimental data point
+        :return: optimal gamma in a one-element list and the log likelihood of the result
+        """
+        alpha = alpha[0]
+        num = n ** 3 * sig_eps ** 4 * self.gmu_
+        num += n ** 2 * sig_eps ** 2 * self.gstd_ ** 2 * alpha * exp_val
+
+        den = n ** 3 * sig_eps ** 4
+        den += n * sig_eps ** 2 * self.gstd_ ** 2 * alpha ** 2
+
+        opt_params = [num / den]
+        exp_err = exp_val - ((opt_params[0] * alpha) / n)
+
+        f = self.logp_params(opt_params)
+        f += normal_loglike(exp_err, mu=0, sig=sig_eps)
+        return opt_params, f

@@ -197,18 +197,19 @@ class NOEID(BaseDataID):
     """
     ID objects for NOE back-calc values. NOE values are calculated between
     two atoms, so this requires residue of first atom, first atom name,
-    residue of second atom and second atom name
-    :param res1: residue of first atom
-    :param at1: first atom name
-    :param res2: residue of second atom
-    :param at2: second atom name
+    residue of second atom and second atom name. The atoms they correspond
+    to can be ambigous, so each member is a tuples of possibilties
+    :param res1_list: list of residues of possible first atoms
+    :param at1_list: list of possible first atom name
+    :param res2_list: list of residues of possible second atoms
+    :param at2_list: list of possible second atom names
     """
 
-    def __init__(self, res1, at1, res2, at2):
-        self.res1_ = res1
-        self.res2_ = res2
-        self.at1_ = at1
-        self.at2_ = at2
+    def __init__(self, res1_list, at1_list, res2_list, at2_list):
+        self.res1_ = tuple(res1_list)
+        self.res2_ = tuple(res2_list)
+        self.at1_ = tuple(at1_list)
+        self.at2_ = tuple(at2_list)
         super(NOEID, self).__init__("noe")
 
     def __hash__(self):
@@ -222,8 +223,9 @@ class NOEID(BaseDataID):
             return False
 
     def __str__(self):
-        s = "%i\t%s\t%i\t%s" % (self.res1_, self.at1_, self.res2_, self.at2_)
+        s = "%i\t%s\t%i\t%s" % (self.res1_[0], self.at1_[0], self.res2_[0], self.at2_[0])
         return s
+
 
 class PREID(BaseDataID):
     """
@@ -256,6 +258,7 @@ class PREID(BaseDataID):
     def __str__(self):
         s = "%i\t%s\t%i\t%s" % (self.res1_, self.at1_, self.res2_, self.at2_)
         return s
+
 
 class rPREID(BaseDataID):
     """
@@ -663,6 +666,52 @@ def read_saxs_data(path):
             saxs_data[sid] = (intensity, err)
     exps.close()
     return saxs_data
+
+
+def read_noe_data(path):
+    """
+    Read a file of experimental NOE data. Must be in ENSEMBLE format:
+    res1  atom1 res2    atom2   wildcard(optional)    ave.  low up
+    :param path: path to data file
+    :return: {NOEID: (val, err)} dictionary
+    """
+    noe_data = {}
+    expn = open(path)
+    curr_res1 = []
+    curr_res2 = []
+    curr_at1 = []
+    curr_at2 = []
+    for line in expn:
+        split = line.split()
+        if len(split) < 6 or line.startswith('#'):
+            continue
+        else:
+            try:
+                curr_res1.append(int(split[0]))
+                curr_at1.append(split[1])
+                curr_res2.append(int(split[2]))
+                curr_at2.append(split[3])
+                val = 0  # placeholders
+                err = 0
+                if split[4] == "OR":  # wildcard, so look at next line
+                    continue
+                else:
+                    val = float(split[4])
+                    err = (float(split[5]) + float(split[6])) / 2
+
+            except ValueError:
+                print "NOE data not formatted properly. Please format " \
+                      "as:\n res1  atom1 res2    atom2   wildcard(optional)    ave.  low up"
+                print "Aborting program."
+                sys.exit()
+
+        nid = NOEID(curr_res1, curr_at1, curr_res2, curr_at2)
+        noe_data[nid] = (val, err)
+        curr_res1 = []
+        curr_res2 = []
+        curr_at1 = []
+        curr_at2 = []
+    return noe_data
 
 
 def read_chemshift_data(path):
