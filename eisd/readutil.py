@@ -447,8 +447,9 @@ class RunShiftX(object):
                   "path as the pdb file, with '.cs' appended to the end." \
                   "Please name files correctly or use the 'RUN_SHIFTX' option" \
                   "in your input file."
-            print "Aborting program"
-            sys.exit()
+            # print "Aborting program"
+            # sys.exit()
+            raise IOError
         dout = {}
         i = 0
 
